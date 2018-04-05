@@ -1,0 +1,41 @@
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+* {
+  border: 1px solid red;
+}
+
+img[alt*=".jpg"],
+img[alt*=".jpeg"],
+img[alt*=".gif"],
+img[alt*=".webp"],
+img[alt*=".png"],
+img[alt*="Photographer:"],
+img[alt*="Image of:"],
+img[alt*="Photo of:"],
+img:not([alt$="."]) {
+  outline: 5px solid orange;
+}
+
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
+::selection {
+  color: #000;
+  background: #fbd404;
+}
+
+.clearfix::after {
+  content: "";
+  display: table;
+  clear: both;
+}

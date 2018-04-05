@@ -1,0 +1,38 @@
+@import "./default.scss";
+
+$minheight: 100px;
+@mixin XxY($x, $y) {
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+}
+@mixin flexCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.__calendar {
+  & ._calendar_content {
+    min-width: 350px;
+    display: grid;
+    grid-template-rows: repeat(7, minmax($minheight, 1fr));
+    grid-template-columns: repeat(7, minmax(50px, 1fr));
+    grid-gap: 1fr;
+    min-height: 6*$minheight;
+    justify-content: center;
+    align-items: center;
+    max-width: 100%;
+  }
+
+  & .__calendar_item_header {
+  }
+  & .__calendar_item {
+    // grid-column-start: 2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 100%;
+    overflow: hidden;
+    @include flexCenter();
+    flex-wrap: wrap;
+    &:nth-child(n) {
+    }
+  }
+}
