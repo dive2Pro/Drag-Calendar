@@ -32,6 +32,72 @@ class DateSource extends Container {
 
 const datesourceShared = new DateSource();
 
+const EventEnum = {
+  data: "_Data",
+  hover: "_Hover",
+  temp: "_temp"
+};
+class EventSource extends Container {
+  constructor() {
+    super();
+    this.state = {
+      data: [
+        {
+          id: 0,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-1").getTime(),
+          endTime: new Date("2018-4-4").getTime(),
+          content: "play dota"
+        },
+
+        {
+          id: 1,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-2").getTime(),
+          endTime: new Date("2018-4-3").getTime(),
+          content: "play dota2"
+        },
+        {
+          id: 2,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-1").getTime(),
+          endTime: new Date("2018-4-4, 00:01").getTime(),
+          content: "play dota3"
+        },
+        {
+          id: 3,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-5, 18:00").getTime(),
+          endTime: new Date("2018-4-6, 19:00").getTime(),
+          content: "sleep"
+        },
+        {
+          id: 4,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-5 , 12:12").getTime(),
+          endTime: new Date("2018-4-5 , 13:11").getTime(),
+          content: "eat"
+        }
+      ]
+    };
+
+    this.changeIndex = this.changeIndex.bind(this);
+  }
+  changeIndex(event, index) {
+    let found = event;
+    // const newData = this.state.data.filter(e => {
+    //   const itis = e.id !== id;
+    //   found = itis ? e : found;
+    //   return itis;
+    // });
+    // log(newData)
+    if (found && found.index != index) {
+      event.index = index;
+      // this.setState({ data: [...newData, found] });
+      this.setState({});
+    }
+  }
+}
 console.clear();
 const styles = {
   fontFamily: "sans-serif",
@@ -56,15 +122,92 @@ const getDayOfMonth = time => {
 };
 
 const { Provider, Consumer } = React.createContext({});
+/**
+ *  和每一个 data 比较 并生成事件 EventItem, EventItem 分为下面几种情况
+ *       1. 有前一天和后一天 *****
+ *       2. 有前一天 ****
+ *       3. 有后一天 ***
+ *       4. 一天内 **
+ *         - 一天内按时间排序
+ * @param(any[])
+ *
+ *  */
+const sortEvent = (changeIndex, events, time) => {
+  const fiveStar = [];
+  const fourStar = [];
+  const threeStar = [];
+  let twoStar = [];
+
+  events.forEach(e => {
+    if (e.startTime < time && e.endTime > time + plusDays(1)) {
+      // log(time, e, " - - - -");
+      fiveStar.push(e);
+    } else if (e.startTime < time && e.endTime < time + plusDays(1)) {
+      fourStar.push(e);
+    } else if (e.startTime > time && e.endTime > time + plusDays(1)) {
+      threeStar.push(e);
+    } else {
+      twoStar.push(e);
+    }
+  });
+
+  events.forEach(e => {
+    let index = -1;
+    if (e.startTime >= time && e.startTime <= time + plusDays(1)) {
+      index += fiveStar.length;
+      index += fourStar.length;
+      const threeIndex = threeStar.findIndex(ev => ev === e);
+      // log(threeIndex, ' = threeIndex ', fiveStar)
+      index += threeIndex > -1 ? threeIndex : threeStar.length;
+      index += twoStar.findIndex(ev => ev === e);
+      changeIndex(e, index);
+    }
+  });
+
+  twoStar = twoStar.sort((a, b) => {
+    return a.startTime - b.startTime;
+  });
+  return events.sort((a, b) => a.index - b.index);
+};
 
 class Item extends React.PureComponent {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     const { className = "", time } = this.props;
     return (
-      <div className={"__calendar_item " + className}>
-        <div>{time}</div>
-        <div>{getDayOfMonth(time)}</div>
-      </div>
+      <Subscribe to={[EventSource]}>
+        {({ state, changeIndex }) => {
+          const filtedEvent = state.data.filter(d => {
+            const { startTime, endTime } = d;
+            return (
+              (time >= startTime || startTime - time < plusDays(1)) &&
+              time <= endTime
+            );
+          });
+
+          let events = [];
+          if (filtedEvent.length) {
+            // todo 检查优先级
+            events = sortEvent(changeIndex, filtedEvent, time).map((e, i) => {
+              return (
+                <div key={i} data-index={e.index}>
+                  {" "}
+                  {e.content}{" "}
+                </div>
+              );
+            });
+          }
+          return (
+            <div className={"__calendar_item " + className}>
+              <div>{getDayOfMonth(time)}</div>
+              <div className={`__item_events`}>{events}</div>
+            </div>
+          );
+        }}
+      </Subscribe>
     );
   }
 }
@@ -154,7 +297,7 @@ const _processState = newState => {
   newState.dayoffset = dayoffset;
   newState.day1Time = Day1.getTime();
 
-  log(newState, " = newState");
+  // log(newState, " = newState");
   return newState;
 };
 
@@ -195,7 +338,6 @@ class Days extends React.PureComponent {
         {dateSource => {
           const days = [];
           const { dayoffset, day1Time } = dateSource.state;
-          console.log(dateSource.state, "-");
           new Array(dayoffset).fill(0).forEach((_, i) => {
             days.push(
               <Item
