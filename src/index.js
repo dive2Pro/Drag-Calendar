@@ -1,8 +1,36 @@
 import React from "react";
 import { render } from "react-dom";
+import { Provider as UnStatedProvider, Subscribe, Container } from "unstated";
+
 import "./styles.scss";
 
 const log = console.log.bind(console);
+class DateSource extends Container {
+  constructor() {
+    super();
+    this.state = {};
+    this.change = this.change.bind(this);
+  }
+  init(props) {
+    const date = new Date(props.showDate);
+    let newState = {};
+    newState.currentYear = date.getFullYear();
+    newState.currentMonth = date.getMonth();
+    this.change(newState);
+  }
+  change(state, cb) {
+    let newState = state;
+    const prev = this.state;
+    if (typeof state === "function") {
+      newState = state(prev);
+    }
+    newState = Object.assign({}, prev.state, newState);
+    newState = _processState(newState);
+    this.setState(newState);
+  }
+}
+
+const datesourceShared = new DateSource();
 
 console.clear();
 const styles = {
@@ -64,53 +92,55 @@ class Title extends React.PureComponent {
     const { className = "", currentMonth, currentYear } = this.props;
 
     return (
-      <Consumer>
-        {({ state: { currentMonth, currentYear }, change }) => (
-          <div className={"__calendar_item_title " + className}>
-            {currentYear + " - " + (currentMonth + 1)}
-            <button
-              type="button"
-              onClick={() => {
-                let newMonth = currentMonth - 1;
-                let newYear = currentYear;
-                if (currentMonth == 0) {
-                  newYear -= 1;
-                  newMonth = 11;
-                }
-                change({
-                  currentMonth: newMonth,
-                  currentYear: newYear
-                });
-              }}
-            >
-              {" "}
-              <span role="img" aria-label="prev month">
+      <Subscribe to={[datesourceShared]}>
+        {({ state: { currentMonth, currentYear }, change }) => {
+          return (
+            <div className={"__calendar_item_title " + className}>
+              {currentYear + " - " + (currentMonth + 1)}
+              <button
+                type="button"
+                onClick={() => {
+                  let newMonth = currentMonth - 1;
+                  let newYear = currentYear;
+                  if (currentMonth == 0) {
+                    newYear -= 1;
+                    newMonth = 11;
+                  }
+                  change({
+                    currentMonth: newMonth,
+                    currentYear: newYear
+                  });
+                }}
+              >
                 {" "}
-                ⬅️{" "}
-              </span>{" "}
-            </button>
-            <button
-              onClick={() => {
-                let newMonth = currentMonth + 1;
-                let newYear = currentYear;
-                if (currentMonth == 11) {
-                  newYear += 1;
-                  newMonth = 0;
-                }
-                change({
-                  currentMonth: newMonth,
-                  currentYear: newYear
-                });
-              }}
-            >
-              <span role="img" aria-label="next month">
-                {" "}
-                ➡️{" "}
-              </span>{" "}
-            </button>
-          </div>
-        )}
-      </Consumer>
+                <span role="img" aria-label="prev month">
+                  {" "}
+                  ⬅️{" "}
+                </span>{" "}
+              </button>
+              <button
+                onClick={() => {
+                  let newMonth = currentMonth + 1;
+                  let newYear = currentYear;
+                  if (currentMonth == 11) {
+                    newYear += 1;
+                    newMonth = 0;
+                  }
+                  change({
+                    currentMonth: newMonth,
+                    currentYear: newYear
+                  });
+                }}
+              >
+                <span role="img" aria-label="next month">
+                  {" "}
+                  ➡️{" "}
+                </span>{" "}
+              </button>
+            </div>
+          );
+        }}
+      </Subscribe>
     );
   }
 }
@@ -129,76 +159,80 @@ const _processState = newState => {
 };
 
 class Calender extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this._change = this._change.bind(this);
-    this.state = {};
-  }
-  static getDerivedStateFromProps(nextProps, prevState) {
-    // console.log(nextProps)
-    // log(new Date("2018/4").toLocaleDateString())
-
-    const date = new Date(nextProps.showDate);
-    let newState = {};
-    // log(date.getMonth())
-    if (nextProps.showDate) {
-      newState.currentYear = date.getFullYear();
-      newState.currentMonth = date.getMonth();
-    }
-    return _processState(newState);
-  }
-
-  _change(state, cb) {
-    let newState = state;
-    this.setState(prev => {
-      if (typeof state === "function") {
-        newState = state(prev);
-      }
-      newState = Object.assign({}, prev.state, newState);
-      return _processState(newState);
-    }, cb);
-  }
-
   render() {
-    const { currentYear, currentMonth, dayoffset, day1Time } = this.state;
-    const days = [];
-    const headers = [];
-    new Array(columns).fill(0).forEach((_, i) => {
-      headers.push(
-        <Header key={"header " + i} className="_header" index={i} />
-      );
-    });
-    log(dayoffset, " = dayoffset ", this.state);
-    new Array(dayoffset).fill(0).forEach((_, i) => {
-      days.push(
-        <Item key={"prev - " + i} time={day1Time + minusDays(dayoffset - i)} />
-      );
-    });
-
-    for (let i = 0; i < columns * rows - dayoffset; i++) {
-      days.push(<Item key={"now - " + i} time={day1Time + plusDays(i)} />);
-    }
-
     return (
-      <Provider value={{ state: this.state, change: this._change }}>
-        <section className="__calendar">
-          <Title />
-          <div className="_calendar_content">
-            {headers}
-            {days}
-          </div>
-        </section>
-      </Provider>
+      <section className="__calendar">
+        <Title />
+        <div className="_calendar_content">
+          <Headers />
+          <Days />
+        </div>
+      </section>
     );
   }
 }
+class Headers extends React.PureComponent {
+  render() {
+    return (
+      <Subscribe to={[datesourceShared]}>
+        {() => {
+          const headers = [];
+          new Array(columns).fill(0).forEach((_, i) => {
+            headers.push(
+              <Header key={"header " + i} className="_header" index={i} />
+            );
+          });
+          return headers;
+        }}
+      </Subscribe>
+    );
+  }
+}
+class Days extends React.PureComponent {
+  render() {
+    return (
+      <Subscribe to={[datesourceShared]}>
+        {dateSource => {
+          const days = [];
+          const { dayoffset, day1Time } = dateSource.state;
+          console.log(dateSource.state, "-");
+          new Array(dayoffset).fill(0).forEach((_, i) => {
+            days.push(
+              <Item
+                key={"prev - " + i}
+                time={day1Time + minusDays(dayoffset - i)}
+              />
+            );
+          });
+
+          for (let i = 0; i < columns * rows - dayoffset; i++) {
+            days.push(
+              <Item key={"now - " + i} time={day1Time + plusDays(i)} />
+            );
+          }
+          return <React.Fragment> {days} </React.Fragment>;
+        }}
+      </Subscribe>
+    );
+  }
+}
+
+const Root = props => {
+  datesourceShared.init(props);
+  // log(datesourceShared.state, ' = datasourceShared' , newState)
+  return (
+    <UnStatedProvider>
+      <Calender />
+    </UnStatedProvider>
+  );
+};
 const App = () => (
   <div style={styles}>
-    <Calender showDate={"2018/4/1"} />
+    <Calender />
   </div>
 );
 
-render(<App />, document.getElementById("root"));
+render(<Root showDate={"2018/4/1"} />, document.getElementById("root"));
 
 // Day [ 0 - 6]  -> offset 是第一行中 第一天 与 第一个格子的距离
 // Month [ 0 - 11]

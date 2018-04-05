@@ -1,6 +1,6 @@
 - [ ] 处理 "事件"
       事件 : {
-        mode: "temp" | "data"
+        mode: "temp" | "data" !default
         startTime 
         endTime
         content
@@ -48,4 +48,11 @@
       3. [ ] 拖拽时 有阴影
             由 hover event实现
 - [ ] Item 处理逻辑
-    
+      1. SourceProvider 存储 data
+      2. 和每一个 data 比较 并生成事件 EventItem, EventItem 分为下面几种情况
+          1. 有前一天和后一天 *****
+          2. 有前一天 ****
+          3. 有后一天 ***
+          4. 一天内 **
+            - 一天内按时间排序
+      3. 渲染每一个 事件到 Item
