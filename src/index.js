@@ -223,7 +223,7 @@ const sortEvent = (changeIndex, events, time) => {
       } else {
       // 4星, 如果 index 不为 0 , 找到 5 星 4 星 和 3 星中最index 最大的值
       const _sorted = fiveStar.concat(fourStar).concat(threeStar).sort((a, b) => a.index - b.index)
-      log(_sorted)
+      // log(_sorted)
       index = _sorted[_sorted.length - 1].index + 1;
         const twoIndex = twoStar.findIndex(ev => ev === e);
 
@@ -260,6 +260,26 @@ const hasTrail = (event, time) => {
   return hastrail ? " hastrail " : " ";
 };
 
+const Event = ({e, time}) => {
+  return <div
+  key={e.id}
+  data-time={e.startTime}
+  data-content={e.content}
+  data-index={e.index}
+  style={{
+    backgroundColor: `hsla(${e.index * 30 +
+      50}, 100%, 50%, 0.32)`
+  }}
+  className={"event" + hasHead(e, time) + hasTrail(e, time)}
+>
+  <div className={hasHead(e, time) + " left-drag"}> </div>
+  <div className={"event-content"}>
+    {hasHead(e, time) !== "!" && e.content}
+    - - {e.index}
+  </div>
+  <div className={" right-drag " + hasTrail(e, time)} />
+</div>
+}
 class Item extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -283,6 +303,21 @@ class Item extends React.PureComponent {
             let emptykey = 0;
             // todo 检查优先级
             const sortedEvents = sortEvent(changeIndex, filtedEvent, time);
+            const maxIndex = sortedEvents[sortedEvents.length -1].index;
+            for (let i = 0 ; i <= maxIndex; i ++ ) {
+              const found = sortedEvents.find( e => e.index == i)
+              if (found) {
+                if (i ===2 ) {
+                  // log(found)
+                }
+                events[i] = <Event e={found} time={time} />
+              } else {
+            // log(maxIndex , ' = maxIndex')
+                
+                events[i] = <div key={i + "_empty"} className="event-empty" />
+              }
+            } 
+            log(events, sortedEvents)
             for (let i = -1; i < sortedEvents.length - 1; i++) {
               const e = sortedEvents[i + 1];
               if (e.index !== i) {
@@ -303,7 +338,7 @@ class Item extends React.PureComponent {
               }
             };
 
-            sortedEvents.forEach((e, i) => {
+            [].forEach((e, i) => {
               addEmptyContent(e, i);
               events.push(
                 <div
