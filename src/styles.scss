@@ -44,4 +44,40 @@ $minheight: 100px;
 .__item_events {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.event {
+  height: 20px;
+  border: 1px solid red;
+  width: inherit;
+  display: inherit;
+  &.hashead {
+    border-left: none;
+  }
+
+  &.hastrail {
+    border-right: none;
+  }
+  & .left-drag {
+    min-width: 15px;
+    content: "";
+    &.hashead {
+      display: none;
+    }
+  }
+  & .right-drag {
+    min-width: 15px;
+    &.hastrail {
+      display: none;
+    }
+  }
+  & .event-content {
+    flex: 1;
+  }
+}
+.event-empty {
+  width: 100%;
+  flex: 1;
 }

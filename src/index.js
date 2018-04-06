@@ -45,8 +45,8 @@ class EventSource extends Container {
         {
           id: 0,
           type: EventEnum.data,
-          startTime: new Date("2018-4-1").getTime(),
-          endTime: new Date("2018-4-4").getTime(),
+          startTime: new Date("2018-3-1").getTime(),
+          endTime: new Date("2018-4-2").getTime(),
           content: "play dota"
         },
 
@@ -77,6 +77,13 @@ class EventSource extends Container {
           startTime: new Date("2018-4-5 , 12:12").getTime(),
           endTime: new Date("2018-4-5 , 13:11").getTime(),
           content: "eat"
+        },
+        {
+          id: 5,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-3 , 12:12").getTime(),
+          endTime: new Date("2018-4-4 , 13:11").getTime(),
+          content: "smoking"
         }
       ]
     };
@@ -121,6 +128,11 @@ const getDayOfMonth = time => {
   return helperDate.getDate();
 };
 
+const getDayOfWeek = time => {
+  helperDate.setTime(time)
+  return helperDate.getDay()
+
+}
 const { Provider, Consumer } = React.createContext({});
 /**
  *  和每一个 data 比较 并生成事件 EventItem, EventItem 分为下面几种情况
@@ -139,27 +151,94 @@ const sortEvent = (changeIndex, events, time) => {
   let twoStar = [];
 
   events.forEach(e => {
-    if (e.startTime < time && e.endTime > time + plusDays(1)) {
+    if (e.startTime < time && e.endTime >= time + plusDays(1)) {
       // log(time, e, " - - - -");
       fiveStar.push(e);
     } else if (e.startTime < time && e.endTime < time + plusDays(1)) {
       fourStar.push(e);
-    } else if (e.startTime > time && e.endTime > time + plusDays(1)) {
+    } else if (e.startTime >= time && e.endTime > time + plusDays(1)) {
       threeStar.push(e);
     } else {
       twoStar.push(e);
     }
   });
+  const allStar = fiveStar.concat(fourStar).concat(threeStar).concat(twoStar);
+  
+  allStar.forEach(e => {
+    let index = 0
+    if (e.startTime < time && getDayOfWeek(time) === 0){
+      // 在每周日, 检查 fiveStar 和 fourStar 的 index
+      // fiveStar 根据 起止 时间排序
+      fiveStar.sort((a, b) => {
+        if (a.startTime === b.startTime) {
+          return b.endTime - a.endTime
+        } else {
+          return a.startTime - b.startTime
+        }
+      }).forEach((e, i ) => {
+        if(e.index == void 0) {
+          // 没有设置
+          changeIndex(e, i)
+        }
+      })
+      fourStar.sort((a,b) => {
+        if (a.startTime === b.startTime) {
+          return b.endTime - a.endTime
+        } else {
+          return a.startTime - b.startTime
+        }
+      }).forEach((e, i) => {
+        if (e.index == void 0) {
+          changeIndex(e, fiveStar.length + 1 + i)
+        }
+      })
+    } 
+  })
 
-  events.forEach(e => {
-    let index = -1;
+  allStar.forEach(e => {
+    let index = 0;
+    // 事件的起点在 这个 time 内 或者 是每一周开始时
+
     if (e.startTime >= time && e.startTime <= time + plusDays(1)) {
       index += fiveStar.length;
       index += fourStar.length;
+
+      
+      // 如果这里 index 不为0 那么取 5星和4星 中 index 最大的值 , 加 1 后设置为 index
+      if (index !== 0) {
+        const _sorted = fiveStar.concat(fourStar).sort((a, b) => a.index - b.index)
+        log(_sorted)
+        index = _sorted[_sorted.length - 1].index + 1;
+      }
+      // 3星, 如果 e 在三星中, 该位置 offset,  e.index = index + offset
       const threeIndex = threeStar.findIndex(ev => ev === e);
+
+      // if (time === new Date("2018-4-3").getTime()) {
+      //   // log(fiveStar, events, time, time + plusDays(1))
+      //   log(fiveStar, fourStar, threeStar, twoStar);
+      // }
       // log(threeIndex, ' = threeIndex ', fiveStar)
-      index += threeIndex > -1 ? threeIndex : threeStar.length;
-      index += twoStar.findIndex(ev => ev === e);
+      if (threeIndex > -1) {
+        index += threeIndex;
+      } else {
+      // 4星, 如果 index 不为 0 , 找到 5 星 4 星 和 3 星中最index 最大的值
+      const _sorted = fiveStar.concat(fourStar).concat(threeStar).sort((a, b) => a.index - b.index)
+      log(_sorted)
+      index = _sorted[_sorted.length - 1].index + 1;
+        const twoIndex = twoStar.findIndex(ev => ev === e);
+
+        if (time === new Date("2018-4-3").getTime()) {
+          // log(fiveStar, events, time, time + plusDays(1))
+          // log(twoIndex, index, threeStar)
+        }
+        // index += threeStar.length;
+        index += twoIndex > -1 ? twoIndex : 0;
+        // + index === 0 ? 0 : 1 ;
+      }
+      if (Number.isNaN(index)) {
+        log(index)
+        return
+      }
       changeIndex(e, index);
     }
   });
@@ -168,6 +247,17 @@ const sortEvent = (changeIndex, events, time) => {
     return a.startTime - b.startTime;
   });
   return events.sort((a, b) => a.index - b.index);
+};
+
+const hasHead = (event, time) => {
+  const hashead = event.startTime < time;
+  return hashead ? " hashead " : "";
+};
+
+const hasTrail = (event, time) => {
+  const hastrail = event.endTime > time + plusDays(1);
+
+  return hastrail ? " hastrail " : " ";
 };
 
 class Item extends React.PureComponent {
@@ -190,12 +280,49 @@ class Item extends React.PureComponent {
 
           let events = [];
           if (filtedEvent.length) {
+            let emptykey = 0;
             // todo 检查优先级
-            events = sortEvent(changeIndex, filtedEvent, time).map((e, i) => {
-              return (
-                <div key={i} data-index={e.index}>
-                  {" "}
-                  {e.content}{" "}
+            const sortedEvents = sortEvent(changeIndex, filtedEvent, time);
+            for (let i = -1; i < sortedEvents.length - 1; i++) {
+              const e = sortedEvents[i + 1];
+              if (e.index !== i) {
+                // events[i + 1] = (<div className="event-empty"/>)
+              } else {
+              }
+            }
+            const addEmptyContent = e => {
+              if (e.index) {
+                if (!sortedEvents.find(ev => ev.index === e.index - 1)) {
+                  events.push(
+                    <div
+                      key={e.id + " empty " + emptykey++}
+                      className="event-empty"
+                    />
+                  );
+                }
+              }
+            };
+
+            sortedEvents.forEach((e, i) => {
+              addEmptyContent(e, i);
+              events.push(
+                <div
+                  key={i}
+                  data-time={e.startTime}
+                  data-content={e.content}
+                  data-index={e.index}
+                  style={{
+                    backgroundColor: `hsla(${e.index * 30 +
+                      50}, 100%, 50%, 0.32)`
+                  }}
+                  className={"event" + hasHead(e, time) + hasTrail(e, time)}
+                >
+                  <div className={hasHead(e, time) + " left-drag"}> </div>
+                  <div className={"event-content"}>
+                    {hasHead(e, time) !== "!" && e.content}
+                    - - {e.index}
+                  </div>
+                  <div className={" right-drag " + hasTrail(e, time)} />
                 </div>
               );
             });
