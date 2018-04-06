@@ -46,23 +46,29 @@ class EventSource extends Container {
           id: 0,
           type: EventEnum.data,
           startTime: new Date("2018-3-1").getTime(),
-          endTime: new Date("2018-4-2").getTime(),
-          content: "play dota"
+          endTime: new Date("2018-4-1").getTime(),
+          content: "play DOTA"
         },
-
+        {
+          id: 6,
+          type: EventEnum.data,
+          startTime: new Date("2018-3-1").getTime(),
+          endTime: new Date("2018-4-2").getTime(),
+          content: "play basket"
+        },
         {
           id: 1,
           type: EventEnum.data,
           startTime: new Date("2018-4-2").getTime(),
           endTime: new Date("2018-4-3").getTime(),
-          content: "play dota2"
+          content: "play Music"
         },
         {
           id: 2,
           type: EventEnum.data,
           startTime: new Date("2018-4-1").getTime(),
           endTime: new Date("2018-4-4, 00:01").getTime(),
-          content: "play dota3"
+          content: "play 3333"
         },
         {
           id: 3,
@@ -85,19 +91,28 @@ class EventSource extends Container {
           endTime: new Date("2018-4-5 , 13:11").getTime(),
           content: "smoking"
         },
-        {
-          id: 6,
-          type: EventEnum.data,
-          startTime: new Date("2018-3-1").getTime(),
-          endTime: new Date("2018-4-2").getTime(),
-          content: "play basket"
-        },
+      
         {
           id: 7,
           type: EventEnum.data,
           startTime: new Date("2018-4-3 , 12:12").getTime(),
-          endTime: new Date("2018-4-4, 13:11").getTime(),
+          endTime: new Date("2018-4-3, 13:11").getTime(),
           content: "Swimming"
+        },
+        {
+          id: 8,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-6 , 12:12").getTime(),
+          endTime: new Date("2018-4-6, 13:11").getTime(),
+          content: "Driv to 北京"
+        },
+
+        {
+          id: 9,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-6, 11:12").getTime(),
+          endTime: new Date("2018-4-6, 13:11").getTime(),
+          content: "Driving 上海"
         }
       ]
     };
@@ -159,6 +174,26 @@ const getDayOfWeek = time => {
   return helperDate.getDay();
 };
 const { Provider, Consumer } = React.createContext({});
+
+const sortByStartTime = (a, b) => {
+  return a.startTime - b.startTime;
+};
+
+const sortByIndex = (a, b) => a.index - b.index;
+
+const sortByStartTimeOrLastTime = (a, b) => {
+  if (a.startTime === b.startTime) {
+    return b.endTime - a.endTime;
+  } else {
+    return a.startTime - b.startTime;
+  }
+};
+
+const logGroup = (title, ...args) => {
+    console.group(title)
+    log(args)
+    console.groupEnd()
+}
 /**
  *  和每一个 data 比较 并生成事件 EventItem, EventItem 分为下面几种情况
  *       1. 有前一天和后一天 *****
@@ -172,13 +207,12 @@ const { Provider, Consumer } = React.createContext({});
 const sortEvent = (changeIndex, events, time) => {
   let fiveStar = [];
   let fourStar = [];
-  const threeStar = [];
+  let threeStar = [];
   let twoStar = [];
   let changed = false;
 
   events.forEach(e => {
     if (e.startTime < time && e.endTime >= time + plusDays(1)) {
-      // log(time, e, " - - - -");
       fiveStar.push(e);
     } else if (e.startTime < time && e.endTime < time + plusDays(1)) {
       fourStar.push(e);
@@ -188,45 +222,42 @@ const sortEvent = (changeIndex, events, time) => {
       twoStar.push(e);
     }
   });
+
+  twoStar = twoStar.sort(sortByStartTime);
+  threeStar = threeStar.sort(sortByStartTimeOrLastTime)
   const allStar = fiveStar
     .concat(fourStar)
     .concat(threeStar)
     .concat(twoStar);
 
-  allStar.forEach(e => {
+  fiveStar.concat(fourStar).forEach(e => {
     let index = 0;
-    if (e.startTime < time && getDayOfWeek(time) === 0) {
+    if (getDayOfWeek(time) === 0) {
       // 在每周日, 检查 fiveStar 和 fourStar 的 index
       // fiveStar 根据 起止 时间排序
-      fiveStar = fiveStar.sort((a, b) => {
-        if (a.startTime === b.startTime) {
-          return b.endTime - a.endTime;
-        } else {
-          return a.startTime - b.startTime;
-        }
-      });
+      fiveStar = fiveStar.sort(sortByStartTimeOrLastTime);
       fiveStar.forEach((e, i) => {
         if (e.index == void 0) {
           // 没有设置
           changeIndex(e, i);
         }
       });
-      fourStar = fourStar.sort((a, b) => {
-        if (a.startTime === b.startTime) {
-          return b.endTime - a.endTime;
-        } else {
-          return a.startTime - b.startTime;
-        }
-      });
+      const fiveStarLastIndex =  fiveStar.length ? fiveStar[fiveStar.length -1].index  : -1
+      fourStar = fourStar.sort(sortByStartTimeOrLastTime);
+
       fourStar.forEach((e, i) => {
         if (e.index == void 0) {
           // changed = true
-          changeIndex(e, fiveStar.length + 1 + i);
+          log( JSON.stringify (e), fiveStarLastIndex + 1 + i , i, fiveStarLastIndex)
+          changeIndex(e, fiveStarLastIndex+ 1 + i);
+          log( JSON.stringify (e), fiveStarLastIndex + 1 + i)
+          
           // e.index = fiveStar.length + 1 + i
         }
       });
     }
   });
+  // logGroup('fourStar', fourStar)
 
   // 事件的起点在 这个 time 内
   // 不关联 4星和5星的排序
@@ -235,25 +266,11 @@ const sortEvent = (changeIndex, events, time) => {
 
   // 如果 index 和 高星有冲突
   // 变成  [1, 3, 4]
-  const highStar = fiveStar.concat(fourStar).sort((a,b) => a.index - b.index);
+  const highStar = fiveStar.concat(fourStar).sort(sortByIndex);
   let lowStar = threeStar.concat(twoStar);
 
   lowStar.forEach(e => {
     let index = 0;
-
-    // index += fiveStar.length;
-    // index += fourStar.length;
-    // // 如果这里 index 不为0 那么取 5星和4星 中 index 最大的值 , 加 1 后设置为 index
-    // if (index !== 0) {
-    //   const _sorted = fiveStar
-    //     .concat(fourStar)
-    //     .sort((a, b) => a.index - b.index);
-    //   const max = _sorted[_sorted.length - 1].index;
-    //   const min = _sorted[0].index;
-
-    //   index = _sorted[_sorted.length - 1].index + 1;
-    // }
-
     // 3星, 如果 e 在三星中, 该位置 offset,  e.index = index + offset
     const threeIndex = threeStar.findIndex(ev => ev === e);
 
@@ -264,7 +281,7 @@ const sortEvent = (changeIndex, events, time) => {
       const _sorted =
         // fiveStar
         // .concat(fourStar)
-        threeStar.sort((a, b) => a.index - b.index);
+        threeStar.sort(sortByIndex);
       // log(_sorted)
       if (threeStar.length) {
         index = _sorted[_sorted.length - 1].index + 1;
@@ -290,14 +307,12 @@ const sortEvent = (changeIndex, events, time) => {
   // log(lowStar)
   const result = [];
   const addToResult = res => {
-    log(' result add ', res)
-    result.push(res)
-  }
+    result.push(res);
+  };
   // console.group(" index changed ");
   // log(highStar, lowStar, events);
-  console.groupEnd();
-
-  lowStar = lowStar.sort((a,b) => a.index - b.index)
+  // console.groupEnd();
+  lowStar = lowStar.sort(sortByIndex);
   let currentEvent;
   while ((currentEvent = highStar.shift())) {
     let lowCurrentEvent;
@@ -306,10 +321,10 @@ const sortEvent = (changeIndex, events, time) => {
       // log(lowCurrentEvent, ' = ' , currentEvent)
       if (lowCurrentEvent.index < currentEvent.index) {
         // result.push(lowCurrentEvent);
-        addToResult(lowCurrentEvent)
+        addToResult(lowCurrentEvent);
       } else {
         lowStar.unshift(lowCurrentEvent);
-        break
+        break;
       }
     }
     // lowCurrentEvent.index ++
@@ -318,16 +333,14 @@ const sortEvent = (changeIndex, events, time) => {
       // e.index ++
     });
     // result.push(currentEvent);
-    addToResult(currentEvent)
+    addToResult(currentEvent);
   }
-  if(lowStar.length) {
-    lowStar.forEach(addToResult)
+  if (lowStar.length) {
+    lowStar.forEach(addToResult);
   }
   // [0, undefined, 2]
   // log(result.length, events)
-  console.group("result ");
-  log(result, events);
-  console.groupEnd();
+  logGroup("result", result , events)
   return result;
 
   // return events.sort((a, b) => a.index - b.index);
