@@ -88,4 +88,11 @@
           2. 2
           3. 0
       
-           
+
+## bug 贴顶问题
+
+> 在 跨周 的事件渲染的时候, index 已经被设置, 依照其 进行的逻辑处理 会造成 event div 上面有 empty-content, 不能贴顶. 并且由于在 sortEvent 时已经处理了 lowStar 的 index, 同样会使 empty-content 出现的位置错误
+
+考虑:
+
+  1. ~~取消 event data 中的 index 属性, 改为 渲染前计算~~. 不修改 event 中的 data, 而是在 Week 中复制 data, 计算后赋值 index, 在本周中的 Day 都以改 index 为值来计算

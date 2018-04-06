@@ -1,10 +1,14 @@
 import React, { Children } from "react";
 import { render } from "react-dom";
 import { Provider as UnStatedProvider, Subscribe, Container } from "unstated";
-
+import cloneDeep from "lodash.clonedeep";
 import "./styles.scss";
 
 const log = console.log.bind(console);
+console.clear();
+
+log(cloneDeep, "---");
+
 class DateSource extends Container {
   constructor() {
     super();
@@ -153,7 +157,6 @@ class EventSource extends Container {
     //
   }
 }
-console.clear();
 const styles = {
   fontFamily: "sans-serif",
   textAlign: "center"
@@ -394,47 +397,41 @@ const Event = ({ e, time }) => {
 class Item extends React.PureComponent {
   componentDidUpdate() {}
   render() {
-    const { className = "", time, pushEmpty } = this.props;
-    return (
-      <Subscribe to={[EventSource]}>
-        {({ state, changeIndex }) => {
-          const filtedEvent = state.data.filter(d => {
-            const { startTime, endTime } = d;
-            return (
-              (time >= startTime || startTime - time < plusDays(1)) &&
-              time <= endTime
-            );
-          });
+    const { className = "", time, pushEmpty, data, changeIndex } = this.props;
 
-          let events = [];
-          if (filtedEvent.length) {
-            let emptykey = 0;
-            const sortedEvents = sortEvent(changeIndex, filtedEvent, time);
-            const maxIndex = sortedEvents[sortedEvents.length - 1].index;
-            for (let i = 0; i <= maxIndex; i++) {
-              const found = sortedEvents.find(e => e.index == i);
-              if (found) {
-                events[i] = <Event e={found} time={time} />;
-              } else {
-                // 检查:
-                //  如果是 每一周的第一天,
-                events[i] = <div key={i + "_empty"} className="event-empty" />;
-                pushEmpty(i, getDayOfMonth(time))
-                if (getDayOfWeek(time) === 0) {
-                } else {
-                  // 不然检查是否有
-                }
-              }
-            }
+    const filtedEvent = data.filter(d => {
+      const { startTime, endTime } = d;
+      return (
+        (time >= startTime || startTime - time < plusDays(1)) && time <= endTime
+      );
+    });
+
+    let events = [];
+    if (filtedEvent.length) {
+      let emptykey = 0;
+      const sortedEvents = sortEvent(changeIndex, filtedEvent, time);
+      const maxIndex = sortedEvents[sortedEvents.length - 1].index;
+      for (let i = 0; i <= maxIndex; i++) {
+        const found = sortedEvents.find(e => e.index == i);
+        if (found) {
+          events[i] = <Event e={found} time={time} />;
+        } else {
+          // 检查:
+          //  如果是 每一周的第一天,
+          events[i] = <div key={i + "_empty"} className="event-empty" />;
+          pushEmpty(i, getDayOfMonth(time));
+          if (getDayOfWeek(time) === 0) {
+          } else {
+            // 不然检查是否有
           }
-          return (
-            <div className={"__calendar_item " + className}>
-              <div>{getDayOfMonth(time)}</div>
-              <div className={`__item_events`}>{events}</div>
-            </div>
-          );
-        }}
-      </Subscribe>
+        }
+      }
+    }
+    return (
+      <div className={"__calendar_item " + className}>
+        <div>{getDayOfMonth(time)}</div>
+        <div className={`__item_events`}>{events}</div>
+      </div>
     );
   }
 }
@@ -589,17 +586,29 @@ class Week extends React.PureComponent {
     this._weekDiv = n;
   };
   _pushEmpty = (level, index) => {
-    this._emptys[level] = this._emptys[level] || []
-    this._emptys[level].push(index)
-
+    this._emptys[level] = this._emptys[level] || [];
+    this._emptys[level].push(index);
   };
+  _changeIndex = (e, index) => {
+    e.index = index;
+  };
+
   render() {
     const self = this;
     return (
       <div className="__week" ref={this.__weekRef}>
-        {Children.map(this.props.children, function map(child) {
-          return React.cloneElement(child, { pushEmpty: self._pushEmpty });
-        })}
+        <Subscribe to={[EventSource]}>
+          {({ state, changeIndex }) => {
+            this._data = cloneDeep(state.data);
+            return Children.map(this.props.children, function map(child) {
+              return React.cloneElement(child, {
+                pushEmpty: self._pushEmpty,
+                changeIndex: self._changeIndex,
+                data: self._data
+              });
+            });
+          }}
+        </Subscribe>
       </div>
     );
   }
