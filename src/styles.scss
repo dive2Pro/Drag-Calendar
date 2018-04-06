@@ -77,6 +77,20 @@ $minheight: 100px;
   & .event-content {
     flex: 1;
   }
+  &._temp{
+    background-color: red;
+    position: relative;
+    &::after{
+      position: absolute;
+      content: " ";
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      background-color: #8e8c8cb0;
+    }
+  }
+
 }
 .event-empty {
   width: 100%;
@@ -88,14 +102,6 @@ $minheight: 100px;
   display: flex;
   min-height: 120px;
   width: 100%;
-  &.erase-first-empty-child {
-    .__item_events{
-      & > .event-empty {
-        display: none;
-      }
-    }
-  }
-  
 }
 .__headers{
   display: flex;

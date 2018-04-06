@@ -10,6 +10,7 @@
         "pragma": "React.createElement"
       }
     ],
-    ["transform-class-properties"]
+    ["transform-class-properties"],
+    ["transform-decorators-legacy"]
   ]
 }

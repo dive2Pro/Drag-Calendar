@@ -2,12 +2,12 @@ import React, { Children } from "react";
 import { render } from "react-dom";
 import { Provider as UnStatedProvider, Subscribe, Container } from "unstated";
 import cloneDeep from "lodash.clonedeep";
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 import "./styles.scss";
 
 const log = console.log.bind(console);
 console.clear();
-
-log(cloneDeep, "---");
 
 class DateSource extends Container {
   constructor() {
@@ -100,16 +100,16 @@ class EventSource extends Container {
           id: 7,
           type: EventEnum.data,
           startTime: new Date("2018-4-3 , 12:12").getTime(),
-          endTime: new Date("2018-4-3, 13:11").getTime(),
+          endTime: new Date("2018-4-13, 13:11").getTime(),
           content: "Swimming"
         },
-        {
-          id: 8,
-          type: EventEnum.data,
-          startTime: new Date("2018-4-6 , 12:12").getTime(),
-          endTime: new Date("2018-4-12, 13:11").getTime(),
-          content: "Driv to 北京"
-        },
+        // {
+        //   id: 8,
+        //   type: EventEnum.data,
+        //   startTime: new Date("2018-4-6 , 12:12").getTime(),
+        //   endTime: new Date("2018-4-12, 13:11").getTime(),
+        //   content: "Driv to 北京"
+        // },
 
         {
           id: 9,
@@ -124,38 +124,28 @@ class EventSource extends Container {
           startTime: new Date("2018-4-17, 11:12").getTime(),
           endTime: new Date("2018-4-18, 13:11").getTime(),
           content: " 迟到在"
+        },
+        {
+          id: 10>>1,
+          type: EventEnum.temp,
+          startTime: new Date("2018-4-6 , 12:12").getTime(),
+          endTime: new Date("2018-4-12, 13:11").getTime(),
+          content: "Driv to 北京"
         }
       ]
     };
-
-    this.changeIndex = this.changeIndex.bind(this);
-  }
-  changeIndex(event, index) {
-    let found = event;
-    // const newData = this.state.data.filter(e => {
-    //   const itis = e.id !== id;
-    //   found = itis ? e : found;
-    //   return itis;
-    // });
-    // log(newData)
-    if (found && found.index != index) {
-      event.index = index;
-      // this.setState({ data: [...newData, found] });
-      // this.setState({});
-    }
   }
 
   /**
-   * 0. 计算 这个 month 中 42 格的 起点 beginTime 和 终点 endTime
-   * 1. 过滤 不在该 [beginTime, endTime] 的 event
-   * 2.
-   *
-   * @param {string} date Year, Month : [year-month]
+   * 
+   * @param {event} e 
+   * @param {EventEnum} type 
    */
-  updateIndex(date) {
-    const { data } = this.state;
-    //
+  changeEventState(e, type) {
+    e.type = type
+    this.setState({})
   }
+
 }
 const styles = {
   fontFamily: "sans-serif",
@@ -374,7 +364,7 @@ const Event = ({ e, time }) => {
       style={{
         backgroundColor: `hsla(${e.index * 30 + 50}, 100%, 50%, 0.32)`
       }}
-      className={"event" + hasHead(e, time) + hasTrail(e, time)}
+      className={"event" + hasHead(e, time) + hasTrail(e, time) + " " + e.type}
     >
       <div className={hasHead(e, time) + " left-drag"}> </div>
       <div className={"event-content"}>
@@ -388,7 +378,7 @@ const Event = ({ e, time }) => {
 class Item extends React.PureComponent {
   componentDidUpdate() {}
   render() {
-    const { className = "", time, pushEmpty, data, changeIndex } = this.props;
+    const { className = "", time, data, changeIndex } = this.props;
 
     const filtedEvent = data.filter(d => {
       const { startTime, endTime } = d;
@@ -410,7 +400,6 @@ class Item extends React.PureComponent {
           // 检查:
           //  如果是 每一周的第一天,
           events[i] = <div key={i + "_empty"} className="event-empty" />;
-          pushEmpty(i, getDayOfMonth(time));
           if (getDayOfWeek(time) === 0) {
           } else {
             // 不然检查是否有
@@ -418,6 +407,7 @@ class Item extends React.PureComponent {
         }
       }
     }
+
     return (
       <div className={"__calendar_item " + className}>
         <div>{getDayOfMonth(time)}</div>
@@ -515,6 +505,7 @@ const _processState = newState => {
   return newState;
 };
 
+@DragDropContext(HTML5Backend)
 class Calender extends React.PureComponent {
   render() {
     return (
@@ -550,35 +541,8 @@ class Week extends React.PureComponent {
   constructor(props) {
     super(props);
   }
-  componentDidUpdate() {
-    this._removeEmpty();
-  }
-
-  componentDidMount() {
-    this._removeEmpty();
-  }
-
-  _removeEmpty = () => {
-    if (this._weekDiv) {
-      const events = this._weekDiv.getElementsByClassName("__item_events");
-      const canEraseFirstChild = [].every.call(events, function(e) {
-        if (e.firstChild) {
-          return e.firstChild.className === "event-empty";
-        }
-        return true;
-      });
-      if (canEraseFirstChild) {
-        // this._weekDiv.className += " erase-first-empty-child ";
-      }
-      log(canEraseFirstChild);
-    }
-  };
   __weekRef = n => {
     this._weekDiv = n;
-  };
-  _pushEmpty = (level, index) => {
-    this._emptys[level] = this._emptys[level] || [];
-    this._emptys[level].push(index);
   };
   _changeIndex = (e, index) => {
     e.index = index;
@@ -593,7 +557,6 @@ class Week extends React.PureComponent {
             this._data = cloneDeep(state.data);
             return Children.map(this.props.children, function map(child) {
               return React.cloneElement(child, {
-                pushEmpty: self._pushEmpty,
                 changeIndex: self._changeIndex,
                 data: self._data
               });
@@ -645,17 +608,11 @@ class Days extends React.PureComponent {
 
 const Root = props => {
   datesourceShared.init(props);
-  // log(datesourceShared.state, ' = datasourceShared' , newState)
   return (
     <UnStatedProvider>
       <Calender />
     </UnStatedProvider>
   );
 };
-const App = () => (
-  <div style={styles}>
-    <Calender />
-  </div>
-);
 
 render(<Root showDate={"2018/4/1"} />, document.getElementById("root"));
