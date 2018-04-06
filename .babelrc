@@ -9,6 +9,7 @@
       {
         "pragma": "React.createElement"
       }
-    ]
+    ],
+    ["transform-class-properties"]
   ]
 }

@@ -12,16 +12,16 @@ $minheight: 100px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  flex-wrap: wrap;
   flex-direction: column;
 }
 .__calendar {
   & ._calendar_content {
     min-width: 350px;
-    display: grid;
+    // display: grid;
+    display: flex;
+    flex-direction: column;
     // grid-template-rows: repeat(7, minmax($minheight, 1fr));
-    grid-template-columns: repeat(7, minmax(50px, 1fr));
-    grid-gap: 1fr;
+    // grid-template-columns: repeat(7, minmax(50px, 1fr));
     min-height: 6*$minheight;
     justify-content: center;
     align-items: center;
@@ -29,13 +29,14 @@ $minheight: 100px;
   }
 
   & .__calendar_item_header {
+    flex:1;
   }
   & .__calendar_item {
     // grid-column-start: 2;
     text-overflow: ellipsis;
     white-space: nowrap;
-    height: 100%;
     overflow: hidden;
+    flex:1;
     @include flexColumnCenter();
     &:nth-child(n) {
     }
@@ -49,7 +50,7 @@ $minheight: 100px;
 }
 
 .event {
-  height: 20px;
+  min-height: 20px;
   border: 1px solid red;
   width: inherit;
   display: inherit;
@@ -80,5 +81,23 @@ $minheight: 100px;
 .event-empty {
   width: 100%;
   flex: 1;
-  height: 22px;
+  min-height: 22px;
+}
+
+.__week{
+  display: flex;
+  min-height: 120px;
+  width: 100%;
+  &.erase-first-empty-child {
+    .__item_events{
+      & > .event-empty {
+        display: none;
+      }
+    }
+  }
+  
+}
+.__headers{
+  display: flex;
+  margin-bottom: 20px;
 }

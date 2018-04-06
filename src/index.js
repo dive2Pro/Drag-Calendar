@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Children } from "react";
 import { render } from "react-dom";
 import { Provider as UnStatedProvider, Subscribe, Container } from "unstated";
 
@@ -60,7 +60,7 @@ class EventSource extends Container {
           id: 1,
           type: EventEnum.data,
           startTime: new Date("2018-4-2").getTime(),
-          endTime: new Date("2018-4-3").getTime(),
+          endTime: new Date("2018-4-12").getTime(),
           content: "play Music"
         },
         {
@@ -88,10 +88,10 @@ class EventSource extends Container {
           id: 5,
           type: EventEnum.data,
           startTime: new Date("2018-4-3 , 12:12").getTime(),
-          endTime: new Date("2018-4-5 , 13:11").getTime(),
+          endTime: new Date("2018-4-14 , 13:11").getTime(),
           content: "smoking"
         },
-      
+
         {
           id: 7,
           type: EventEnum.data,
@@ -103,7 +103,7 @@ class EventSource extends Container {
           id: 8,
           type: EventEnum.data,
           startTime: new Date("2018-4-6 , 12:12").getTime(),
-          endTime: new Date("2018-4-6, 13:11").getTime(),
+          endTime: new Date("2018-4-17, 13:11").getTime(),
           content: "Driv to 北京"
         },
 
@@ -113,6 +113,13 @@ class EventSource extends Container {
           startTime: new Date("2018-4-6, 11:12").getTime(),
           endTime: new Date("2018-4-6, 13:11").getTime(),
           content: "Driving 上海"
+        },
+        {
+          id: 10,
+          type: EventEnum.data,
+          startTime: new Date("2018-4-17, 11:12").getTime(),
+          endTime: new Date("2018-4-18, 13:11").getTime(),
+          content: " 迟到在"
         }
       ]
     };
@@ -190,10 +197,10 @@ const sortByStartTimeOrLastTime = (a, b) => {
 };
 
 const logGroup = (title, ...args) => {
-    console.group(title)
-    log(args)
-    console.groupEnd()
-}
+  console.group(title);
+  log(args);
+  console.groupEnd();
+};
 /**
  *  和每一个 data 比较 并生成事件 EventItem, EventItem 分为下面几种情况
  *       1. 有前一天和后一天 *****
@@ -224,7 +231,7 @@ const sortEvent = (changeIndex, events, time) => {
   });
 
   twoStar = twoStar.sort(sortByStartTime);
-  threeStar = threeStar.sort(sortByStartTimeOrLastTime)
+  threeStar = threeStar.sort(sortByStartTimeOrLastTime);
   const allStar = fiveStar
     .concat(fourStar)
     .concat(threeStar)
@@ -242,16 +249,22 @@ const sortEvent = (changeIndex, events, time) => {
           changeIndex(e, i);
         }
       });
-      const fiveStarLastIndex =  fiveStar.length ? fiveStar[fiveStar.length -1].index  : -1
+      const fiveStarLastIndex = fiveStar.length
+        ? fiveStar[fiveStar.length - 1].index
+        : -1;
       fourStar = fourStar.sort(sortByStartTimeOrLastTime);
 
       fourStar.forEach((e, i) => {
         if (e.index == void 0) {
           // changed = true
-          log( JSON.stringify (e), fiveStarLastIndex + 1 + i , i, fiveStarLastIndex)
-          changeIndex(e, fiveStarLastIndex+ 1 + i);
-          log( JSON.stringify (e), fiveStarLastIndex + 1 + i)
-          
+          log(
+            JSON.stringify(e),
+            fiveStarLastIndex + 1 + i,
+            i,
+            fiveStarLastIndex
+          );
+          changeIndex(e, fiveStarLastIndex + 1 + i);
+          log(JSON.stringify(e), fiveStarLastIndex + 1 + i);
           // e.index = fiveStar.length + 1 + i
         }
       });
@@ -340,7 +353,7 @@ const sortEvent = (changeIndex, events, time) => {
   }
   // [0, undefined, 2]
   // log(result.length, events)
-  logGroup("result", result , events)
+  // logGroup("result", result , events)
   return result;
 
   // return events.sort((a, b) => a.index - b.index);
@@ -379,12 +392,9 @@ const Event = ({ e, time }) => {
   );
 };
 class Item extends React.PureComponent {
-  constructor(props) {
-    super(props);
-  }
-
+  componentDidUpdate() {}
   render() {
-    const { className = "", time } = this.props;
+    const { className = "", time, pushEmpty } = this.props;
     return (
       <Subscribe to={[EventSource]}>
         {({ state, changeIndex }) => {
@@ -399,66 +409,23 @@ class Item extends React.PureComponent {
           let events = [];
           if (filtedEvent.length) {
             let emptykey = 0;
-            // todo 检查优先级
             const sortedEvents = sortEvent(changeIndex, filtedEvent, time);
             const maxIndex = sortedEvents[sortedEvents.length - 1].index;
             for (let i = 0; i <= maxIndex; i++) {
               const found = sortedEvents.find(e => e.index == i);
               if (found) {
-                if (i === 2) {
-                  // log(found)
-                }
                 events[i] = <Event e={found} time={time} />;
               } else {
-                // log(maxIndex , ' = maxIndex')
-
+                // 检查:
+                //  如果是 每一周的第一天,
                 events[i] = <div key={i + "_empty"} className="event-empty" />;
-              }
-            }
-            // log(events, sortedEvents);
-            for (let i = -1; i < sortedEvents.length - 1; i++) {
-              const e = sortedEvents[i + 1];
-              if (e.index !== i) {
-                // events[i + 1] = (<div className="event-empty"/>)
-              } else {
-              }
-            }
-            const addEmptyContent = e => {
-              if (e.index) {
-                if (!sortedEvents.find(ev => ev.index === e.index - 1)) {
-                  events.push(
-                    <div
-                      key={e.id + " empty " + emptykey++}
-                      className="event-empty"
-                    />
-                  );
+                pushEmpty(i, getDayOfMonth(time))
+                if (getDayOfWeek(time) === 0) {
+                } else {
+                  // 不然检查是否有
                 }
               }
-            };
-
-            [].forEach((e, i) => {
-              addEmptyContent(e, i);
-              events.push(
-                <div
-                  key={i}
-                  data-time={e.startTime}
-                  data-content={e.content}
-                  data-index={e.index}
-                  style={{
-                    backgroundColor: `hsla(${e.index * 30 +
-                      50}, 100%, 50%, 0.32)`
-                  }}
-                  className={"event" + hasHead(e, time) + hasTrail(e, time)}
-                >
-                  <div className={hasHead(e, time) + " left-drag"}> </div>
-                  <div className={"event-content"}>
-                    {hasHead(e, time) !== "!" && e.content}
-                    - - {e.index}
-                  </div>
-                  <div className={" right-drag " + hasTrail(e, time)} />
-                </div>
-              );
-            });
+            }
           }
           return (
             <div className={"__calendar_item " + className}>
@@ -475,7 +442,6 @@ class Item extends React.PureComponent {
 class Header extends React.PureComponent {
   render() {
     const { className = "", index } = this.props;
-
     return (
       <div className={"__calendar_item_header " + className}> {index} </div>
     );
@@ -566,8 +532,8 @@ class Calender extends React.PureComponent {
     return (
       <section className="__calendar">
         <Title />
+        <Headers />
         <div className="_calendar_content">
-          <Headers />
           <Days />
         </div>
       </section>
@@ -585,9 +551,56 @@ class Headers extends React.PureComponent {
               <Header key={"header " + i} className="_header" index={i} />
             );
           });
-          return headers;
+          return <div className="__headers">{headers}</div>;
         }}
       </Subscribe>
+    );
+  }
+}
+class Week extends React.PureComponent {
+  _emptys = [];
+  constructor(props) {
+    super(props);
+  }
+  componentDidUpdate() {
+    this._removeEmpty();
+  }
+
+  componentDidMount() {
+    this._removeEmpty();
+  }
+
+  _removeEmpty = () => {
+    if (this._weekDiv) {
+      const events = this._weekDiv.getElementsByClassName("__item_events");
+      const canEraseFirstChild = [].every.call(events, function(e) {
+        if (e.firstChild) {
+          return e.firstChild.className === "event-empty";
+        }
+        return true;
+      });
+      if (canEraseFirstChild) {
+        // this._weekDiv.className += " erase-first-empty-child ";
+      }
+      log(canEraseFirstChild);
+    }
+  };
+  __weekRef = n => {
+    this._weekDiv = n;
+  };
+  _pushEmpty = (level, index) => {
+    this._emptys[level] = this._emptys[level] || []
+    this._emptys[level].push(index)
+
+  };
+  render() {
+    const self = this;
+    return (
+      <div className="__week" ref={this.__weekRef}>
+        {Children.map(this.props.children, function map(child) {
+          return React.cloneElement(child, { pushEmpty: self._pushEmpty });
+        })}
+      </div>
     );
   }
 }
@@ -598,21 +611,32 @@ class Days extends React.PureComponent {
         {dateSource => {
           const days = [];
           const { dayoffset, day1Time } = dateSource.state;
-          new Array(dayoffset).fill(0).forEach((_, i) => {
-            days.push(
-              <Item
-                key={"prev - " + i}
-                time={day1Time + minusDays(dayoffset - i)}
-              />
-            );
-          });
+          let _dayOff = dayoffset;
+          let weeks = [];
 
-          for (let i = 0; i < columns * rows - dayoffset; i++) {
-            days.push(
-              <Item key={"now - " + i} time={day1Time + plusDays(i)} />
-            );
+          for (let i = 0; i < rows; i++) {
+            let week = [];
+            for (let c = 0; c < columns; c++) {
+              if (_dayOff != 0) {
+                week.push(
+                  <Item
+                    key={"prev - " + i + " - " + c}
+                    time={day1Time + minusDays(_dayOff)}
+                  />
+                );
+                _dayOff -= 1;
+              } else {
+                week.push(
+                  <Item
+                    key={i + " " + c}
+                    time={day1Time + plusDays(c + i * 7 - dayoffset)}
+                  />
+                );
+              }
+            }
+            weeks.push(<Week>{week}</Week>);
           }
-          return <React.Fragment> {days} </React.Fragment>;
+          return <React.Fragment> {weeks} </React.Fragment>;
         }}
       </Subscribe>
     );
