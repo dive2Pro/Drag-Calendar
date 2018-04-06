@@ -2,8 +2,8 @@ import React, { Children } from "react";
 import { render } from "react-dom";
 import { Provider as UnStatedProvider, Subscribe, Container } from "unstated";
 import cloneDeep from "lodash.clonedeep";
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { DragDropContext, DragSource, DropTarget } from "react-dnd";
+import HTML5Backend from "react-dnd-html5-backend";
 import "./styles.scss";
 
 const log = console.log.bind(console);
@@ -37,8 +37,8 @@ class DateSource extends Container {
 const datesourceShared = new DateSource();
 
 const EventEnum = {
-  data: "_Data",
-  hover: "_Hover",
+  data: "_data",
+  hover: "_hover",
   temp: "_temp"
 };
 class EventSource extends Container {
@@ -126,8 +126,8 @@ class EventSource extends Container {
           content: " 迟到在"
         },
         {
-          id: 10>>1,
-          type: EventEnum.temp,
+          id: 10 << 1,
+          type: EventEnum.data,
           startTime: new Date("2018-4-6 , 12:12").getTime(),
           endTime: new Date("2018-4-12, 13:11").getTime(),
           content: "Driv to 北京"
@@ -135,18 +135,39 @@ class EventSource extends Container {
       ]
     };
   }
-
+  _temp = null;
   /**
-   * 
-   * @param {event} e 
-   * @param {EventEnum} type 
+   *
+   * @param {event} e
+   * @param {EventEnum} type
    */
   changeEventState(e, type) {
-    e.type = type
-    this.setState({})
+    // log( JSON.stringify (this.state.data))
+    // e.type = type
+    const newData = this.state.data.map(
+      ev => (ev.id === e.id ? { ...e, type } : ev)
+    );
+    log(newData)
+    this.setState({ data: newData });
+    // log( JSON.stringify (this.state.data))
   }
+  generateTempOne = e => {
+    this._temp = cloneDeep({ ...e, id: e.id + "_temp", type: EventEnum.temp });
+    this.state.data.push(this._temp);
+    this.setState({ data: this.state.data });
+  };
 
+  removeTempOne = () => {
+    if (this._temp) {
+      this.setState({
+        data: this.state.data.filter(d => d.id !== this._temp.id)
+      });
+      this._temp = null;
+    }
+  };
 }
+const eventSource = new EventSource();
+
 const styles = {
   fontFamily: "sans-serif",
   textAlign: "center"
@@ -159,6 +180,51 @@ const plusDays = days => {
 const minusDays = days => {
   return -1 * dayMilliseconds * days;
 };
+
+const ItemTypes = {
+  EVENT: "@event"
+};
+
+const EventDragSource = {
+  beginDrag(props) {
+    const { e } = props;
+    // eventSource.generateTempOne(e)
+    log(e, ' --')
+    eventSource.generateTempOne(e);
+
+    eventSource.changeEventState(e, EventEnum.hover);
+    return {
+      id: e.id
+    };
+  },
+  endDrag(props, monitor, component) {
+    log(monitor.didDrop() , ' = didDrop')
+    const { e } = props;
+    
+    if (!monitor.didDrop()) {
+      // You can check whether the drop was successful
+      // or if the drag ended but nobody handled the drop
+    
+      // return;
+    }
+    
+    eventSource.removeTempOne();
+    eventSource.changeEventState(e, EventEnum.data);
+ 
+  },
+  isDragging(props, monitor) {
+    log('isDragging   ' , monitor.getItem(), props.e.id);
+    return props.e.id === monitor.getItem().id;
+  }
+};
+
+function collect(connect, monitor) {
+  return {
+    connectDragSource: connect.dragSource(),
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview()
+  };
+}
 
 const columns = 7;
 const rows = 6;
@@ -214,7 +280,7 @@ const sortEvent = (changeIndex, events, time) => {
   events.forEach(e => {
     if (e.startTime < time) {
       fiveStar.push(e);
-    // } else if (e.startTime < time && e.endTime < time + plusDays(1)) {
+      // } else if (e.startTime < time && e.endTime < time + plusDays(1)) {
       // fourStar.push(e);
     } else if (e.startTime >= time && e.endTime > time + plusDays(1)) {
       threeStar.push(e);
@@ -237,10 +303,7 @@ const sortEvent = (changeIndex, events, time) => {
       // fiveStar 根据 起止 时间排序
       fiveStar = fiveStar.sort(sortByStartTimeOrLastTime);
       fiveStar.forEach((e, i) => {
-        if (e.index == void 0) {
-          // 没有设置
-          changeIndex(e, i);
-        }
+        changeIndex(e, i);
       });
       const fiveStarLastIndex = fiveStar.length
         ? fiveStar[fiveStar.length - 1].index
@@ -248,9 +311,7 @@ const sortEvent = (changeIndex, events, time) => {
       fourStar = fourStar.sort(sortByStartTimeOrLastTime);
 
       fourStar.forEach((e, i) => {
-        if (e.index == void 0) {
-          changeIndex(e, fiveStarLastIndex + 1 + i);
-        }
+        changeIndex(e, fiveStarLastIndex + 1 + i);
       });
     }
   });
@@ -354,32 +415,78 @@ const hasTrail = (event, time) => {
   return hastrail ? " hastrail " : " ";
 };
 
-const Event = ({ e, time }) => {
-  return (
-    <div
-      key={e.id}
-      data-time={e.startTime}
-      data-content={e.content}
-      data-index={e.index}
-      style={{
-        backgroundColor: `hsla(${e.index * 30 + 50}, 100%, 50%, 0.32)`
-      }}
-      className={"event" + hasHead(e, time) + hasTrail(e, time) + " " + e.type}
-    >
-      <div className={hasHead(e, time) + " left-drag"}> </div>
-      <div className={"event-content"}>
-        {hasHead(e, time) !== "!" && e.content}
-        - - {e.index}
+@DragSource(ItemTypes.EVENT, EventDragSource, collect)
+class Event extends React.PureComponent {
+  componentDidMount() {
+    const div = document.createElement("span");
+    // this.props.connectDragPreview(div);
+  }
+  render() {
+    const { e, time, isDragging, connectDragSource } = this.props;
+    return connectDragSource (
+      <div
+        key={e.id}
+        data-time={e.startTime}
+        data-content={e.content}
+        data-index={e.index}
+        style={{
+          backgroundColor: `hsla(${e.index * 30 + 50}, 100%, 50%, 0.32)`,
+          opacity: isDragging ? 0.5 : 1,
+          cursor: "move"
+        }}
+        className={
+          "event" + hasHead(e, time) + hasTrail(e, time) + " " + e.type
+        }
+      >
+        <div className={hasHead(e, time) + " left-drag"}> </div>
+        <div className={"event-content"}>
+          {hasHead(e, time) !== "!" && e.content}
+          - - {e.index}
+        </div>
+        <div className={" right-drag " + hasTrail(e, time)} />
       </div>
-      <div className={" right-drag " + hasTrail(e, time)} />
-    </div>
-  );
+    );
+  }
+}
+
+const eventItemTarget = {
+  drop(props, monitor, component) {
+    if (monitor.didDrop()) {
+
+
+    }
+
+    const item = monitor.getItem();
+    log(item, props)
+    return {
+      moved: true
+    };
+  }
 };
+const dropCollect = (connect, monitor) => {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    isOverCurrent: monitor.isOver({ shallow: true }),
+    canDrop: monitor.canDrop()
+  };
+};
+// @DropTarget(ItemTypes.EVENT, eventItemTarget, dropCollect)
 class Item extends React.PureComponent {
   componentDidUpdate() {}
   render() {
-    const { className = "", time, data, changeIndex } = this.props;
-
+    const {
+      className = "",
+      time,
+      data,
+      changeIndex,
+      connectDropTarget,
+      isOver,
+      canDrop
+    } = this.props;
+    if (typeof data.filter !== "function") {
+      log(this.props);
+    }
     const filtedEvent = data.filter(d => {
       const { startTime, endTime } = d;
       return (
@@ -395,11 +502,15 @@ class Item extends React.PureComponent {
       for (let i = 0; i <= maxIndex; i++) {
         const found = sortedEvents.find(e => e.index == i);
         if (found) {
-          events[i] = <Event e={found} time={time} />;
+          events[i] = (
+            <Event key={found.id + " - " + i} e={found} time={time} />
+          );
         } else {
           // 检查:
           //  如果是 每一周的第一天,
-          events[i] = <div key={i + "_empty"} className="event-empty" />;
+          events[i] = (
+            <div key={i + "_empty " + time} className="event-empty" />
+          );
           if (getDayOfWeek(time) === 0) {
           } else {
             // 不然检查是否有
@@ -552,7 +663,7 @@ class Week extends React.PureComponent {
     const self = this;
     return (
       <div className="__week" ref={this.__weekRef}>
-        <Subscribe to={[EventSource]}>
+        <Subscribe to={[eventSource]}>
           {({ state, changeIndex }) => {
             this._data = cloneDeep(state.data);
             return Children.map(this.props.children, function map(child) {
@@ -591,13 +702,13 @@ class Days extends React.PureComponent {
               } else {
                 week.push(
                   <Item
-                    key={i + " " + c}
+                    key={i + " now " + c}
                     time={day1Time + plusDays(c + i * 7 - dayoffset)}
                   />
                 );
               }
             }
-            weeks.push(<Week>{week}</Week>);
+            weeks.push(<Week key={i + " week- "}>{week}</Week>);
           }
           return <React.Fragment> {weeks} </React.Fragment>;
         }}

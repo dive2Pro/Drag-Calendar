@@ -1,8 +1,5 @@
 {
-  "presets": [
-    "env",
-    "react"
-  ],
+  "presets": ["env", "react", "stage-2"],
   "plugins": [
     [
       "transform-react-jsx",
@@ -10,7 +7,14 @@
         "pragma": "React.createElement"
       }
     ],
+    [
+      "transform-es2015-spread",
+      {
+        "loose": true
+      }
+    ],
     ["transform-class-properties"],
+    ["transform-es2015-destructuring"],
     ["transform-decorators-legacy"]
   ]
 }

@@ -47,6 +47,8 @@
             由 item 实现
       3. [ ] 拖拽时 有阴影
             由 hover event实现
+    [ ] bug : 
+      当 drag 事件的第二行时, endDrag 立即被 call
 - [x] Item 处理逻辑
       1. SourceProvider 存储 data
       2. 和每一个 data 比较 并生成事件 EventItem, EventItem 分为下面几种情况
