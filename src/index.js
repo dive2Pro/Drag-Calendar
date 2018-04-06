@@ -64,7 +64,7 @@ class EventSource extends Container {
           id: 1,
           type: EventEnum.data,
           startTime: new Date("2018-4-2").getTime(),
-          endTime: new Date("2018-4-12").getTime(),
+          endTime: new Date("2018-4-15").getTime(),
           content: "play Music"
         },
         {
@@ -92,7 +92,7 @@ class EventSource extends Container {
           id: 5,
           type: EventEnum.data,
           startTime: new Date("2018-4-3 , 12:12").getTime(),
-          endTime: new Date("2018-4-14 , 13:11").getTime(),
+          endTime: new Date("2018-4-18 , 13:11").getTime(),
           content: "smoking"
         },
 
@@ -107,7 +107,7 @@ class EventSource extends Container {
           id: 8,
           type: EventEnum.data,
           startTime: new Date("2018-4-6 , 12:12").getTime(),
-          endTime: new Date("2018-4-17, 13:11").getTime(),
+          endTime: new Date("2018-4-12, 13:11").getTime(),
           content: "Driv to 北京"
         },
 
@@ -222,10 +222,10 @@ const sortEvent = (changeIndex, events, time) => {
   let changed = false;
 
   events.forEach(e => {
-    if (e.startTime < time && e.endTime >= time + plusDays(1)) {
+    if (e.startTime < time) {
       fiveStar.push(e);
-    } else if (e.startTime < time && e.endTime < time + plusDays(1)) {
-      fourStar.push(e);
+    // } else if (e.startTime < time && e.endTime < time + plusDays(1)) {
+      // fourStar.push(e);
     } else if (e.startTime >= time && e.endTime > time + plusDays(1)) {
       threeStar.push(e);
     } else {
@@ -259,16 +259,7 @@ const sortEvent = (changeIndex, events, time) => {
 
       fourStar.forEach((e, i) => {
         if (e.index == void 0) {
-          // changed = true
-          log(
-            JSON.stringify(e),
-            fiveStarLastIndex + 1 + i,
-            i,
-            fiveStarLastIndex
-          );
           changeIndex(e, fiveStarLastIndex + 1 + i);
-          log(JSON.stringify(e), fiveStarLastIndex + 1 + i);
-          // e.index = fiveStar.length + 1 + i
         }
       });
     }
