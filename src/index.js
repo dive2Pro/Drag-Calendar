@@ -151,7 +151,12 @@ class EventSource extends Container {
     // log( JSON.stringify (this.state.data))
   }
   generateTempOne = e => {
-    this._temp = cloneDeep({ ...e, id: e.id + "_temp", content: 'TEMP@', type: EventEnum.temp });
+    this._temp = cloneDeep({
+      ...e,
+      id: e.id + "_temp",
+      content: "TEMP@",
+      type: EventEnum.temp
+    });
     this.state.data.push(this._temp);
     this.setState({ data: this.state.data });
   };
@@ -166,22 +171,24 @@ class EventSource extends Container {
   };
   /**
    *  根据 delta 修改事件的 起止时间
-   * 
-   * @param {string} id 
-   * @param {number} delta 
+   *
+   * @param {monitor.getItem()} item
+   * @param {number} delta
    */
-  changeEventDate(id, delta) {
+  changeEventDate({id, startTime, endTime }, delta) {
     const newData = this.state.data.map(e => {
       if (e.id == id) {
-        const { startTime, endTime } = e
-        return {...e, startTime: startTime + delta, endTime: endTime + delta}
+        // const { startTime, endTime } = e;
+        return { ...e, startTime: startTime + delta, endTime: endTime + delta };
       }
 
-      return e
-    })
+      return e;
+    });
     this.setState({
       data: newData
-    })
+    });
+  }
+  setOriginalTime(e) {
   }
 }
 const eventSource = new EventSource();
@@ -216,10 +223,12 @@ const EventDragSource = {
     // });
     // eventSource.changeEventState(e, EventEnum.hover);
     eventSource.generateTempOne(e);
-
+    eventSource.setOriginalTime(e)
     return {
       id: e.id,
-      time
+      time,
+      startTime: e.startTime,
+      endTime: e.endTime
     };
   },
   endDrag(props, monitor, component) {
@@ -238,7 +247,12 @@ const EventDragSource = {
   },
   isDragging(props, monitor) {
     // log('isDragging   ' , monitor.getItem(), props.e.id);
-    return props.e.id === monitor.getItem().id;
+    const itIs = props.e.id === monitor.getItem().id;
+
+    if (itIs) {
+    
+    }
+    return itIs;
   }
 };
 
@@ -493,14 +507,14 @@ const eventItemTarget = {
     const item = monitor.getItem();
     // 拿到 event
 
-    // props time 
-    const {time: dropTime } = props
+    // props time
+    const { time: dropTime } = props;
     // 比较 time 和 drop time  = delta
-    const delta = dropTime - item.time
+    const delta = dropTime - item.time ;
     // delta 应用到 event 的 startTime 和 endTime
-  logGroup("drop end ", delta)   
-    
-    eventSource.changeEventDate(item.id, delta)
+    logGroup("drop end ", delta);
+
+    eventSource.changeEventDate(item, delta) ;
     // drop 完成后,
     return {
       moved: true
@@ -512,12 +526,35 @@ const dropCollect = (connect, monitor) => {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
     isOverCurrent: monitor.isOver({ shallow: true }),
-    canDrop: monitor.canDrop()
+    canDrop: monitor.canDrop(),
+    monitor
   };
 };
 @DropTarget(ItemTypes.EVENT, eventItemTarget, dropCollect)
 class Item extends React.PureComponent {
-  componentDidUpdate() {}
+  // static getDerivedStateFromProps(nextProps, prevState) {
+
+  // }
+  componentDidUpdate(prevProps) {
+    if(!prevProps.isOver && this.props.isOver) {
+        // drag item { id, time}
+        const { monitor } = this.props
+        const item = monitor.getItem();
+        // 拿到 event
+        const found = eventSource.state.data.find( e => e.id == item.id)
+        // props time
+        logGroup(' item did up ', item)
+        const { time: movingTime } = this.props;
+        // 比较 time 和 drop time  = delta
+        const delta = movingTime - item.time;
+
+        // delta 应用到 event 的 startTime 和 endTime
+        logGroup("dragging  ",  delta);
+  
+        eventSource.changeEventDate(item, delta);
+    }
+  }
+
   render() {
     const {
       className = "",
@@ -546,9 +583,7 @@ class Item extends React.PureComponent {
       for (let i = 0; i <= maxIndex; i++) {
         const found = sortedEvents.find(e => e.index == i);
         if (found) {
-          events[i] = (
-            <Event key={found.id + " - "} e={found} time={time} />
-          );
+          events[i] = <Event key={found.id + " - "} e={found} time={time} />;
         } else {
           // 检查:
           //  如果是 每一周的第一天,
