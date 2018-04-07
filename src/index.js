@@ -157,8 +157,8 @@ class EventSource extends Container {
       content: "TEMP@",
       type: EventEnum.temp
     });
-    this.state.data.push(this._temp);
-    this.setState({ data: this.state.data });
+    this.state.data.push(this._temp)
+    // 直接修改 不通过 setState 通知修改, 免除的这一次更新会使 "第二行"的 drag 事件不会因为 dom 重新生成而导致 dragend
   };
 
   removeTempOne = () => {

@@ -47,7 +47,7 @@
             由 item 实现
       3. [ ] 拖拽时 有阴影
             由 hover event实现
-    [ ] bug : 
+    [x] bug : 
       当 drag 事件的第二行时, endDrag 立即被 call****
       原因是因为 drag 第二行 时, 此时的 index 已经和上一行的不同, 重新计算后, 第二行 dragging 位置的 dom 可能已经消失
 - [x] Item 处理逻辑
