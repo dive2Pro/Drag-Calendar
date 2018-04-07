@@ -1,10 +1,10 @@
-import React, { PureComponent } from 'react'
-import {DropTarget} from 'react-dnd'
-import {logGroup, log , plusDays, getDayOfMonth} from '../util'
-import {Event} from './Event'
-import { eventSource } from "../provider"
-import { sortEvent } from '../sortEvent'
-import {ItemTypes} from '../constants'
+import React, { PureComponent } from "react";
+import { DropTarget } from "react-dnd";
+import { logGroup, log, plusDays, getDayOfMonth } from "../util";
+import { Event } from "./Event";
+import { eventSource } from "../provider";
+import { sortEvent } from "../sortEvent";
+import { ItemTypes } from "../constants";
 
 const eventItemTarget = {
   drop(props, monitor, component) {
@@ -13,16 +13,20 @@ const eventItemTarget = {
 
     // drag item { id, time}
     const item = monitor.getItem();
-    // 拿到 event
+    const draggingType = monitor.getItemType();
 
-    // props time
-    const { time: dropTime } = props;
-    // 比较 time 和 drop time  = delta
-    const delta = dropTime - item.time;
-    // delta 应用到 event 的 startTime 和 endTime
-    logGroup("drop end ", delta);
+    if (draggingType === ItemTypes.Event) {
+      // 拿到 event
 
-    eventSource.changeEventDate(item, delta);
+      // props time
+      const { time: dropTime } = props;
+      // 比较 time 和 drop time  = delta
+      const delta = dropTime - item.time;
+      // delta 应用到 event 的 startTime 和 endTime
+      logGroup("drop end ", delta);
+
+      eventSource.changeEventDate(item, delta);
+    }
     // drop 完成后,
     return {
       moved: true
@@ -35,30 +39,44 @@ const dropCollect = (connect, monitor) => {
     isOver: monitor.isOver(),
     isOverCurrent: monitor.isOver({ shallow: true }),
     canDrop: monitor.canDrop(),
+    draggingType: monitor.getItemType(),
     monitor
   };
 };
-@DropTarget(ItemTypes.EVENT, eventItemTarget, dropCollect)
+@DropTarget([ItemTypes.EVENT, ItemTypes.STRETCH], eventItemTarget, dropCollect)
 export class Day extends React.PureComponent {
-
-  
   componentDidUpdate(prevProps) {
     if (!prevProps.isOver && this.props.isOver) {
-      // drag item { id, time}
       const { monitor } = this.props;
       const item = monitor.getItem();
-      // 拿到 event
-      const found = eventSource.state.data.find(e => e.id == item.id);
-      // props time
-      logGroup(" item did up ", item);
-      const { time: movingTime } = this.props;
-      // 比较 time 和 drop time  = delta
-      const delta = movingTime - item.time;
+      if (this.props.draggingType === ItemTypes.EVENT) {
+        // drag item { id, time}
+        // props time
+        logGroup(" item did up ", item);
+        const { time: movingTime } = this.props;
+        // 比较 time 和 drop time  = delta
+        const delta = movingTime - item.time;
+        // delta 应用到 event 的 startTime 和 endTime
+        logGroup("dragging  ", delta);
+        eventSource.changeEventDate(item, delta);
+      } else {
+        // TODO:  set with STRETCH
+        logGroup(" Stretch ", item);
+        
+        const { time : draggingTime } = this.props
+        const {time: itemTime, direction } = item
+        const { x, y } = monitor.getDifferenceFromInitialOffset()
 
-      // delta 应用到 event 的 startTime 和 endTime
-      logGroup("dragging  ", delta);
+        let delta = draggingTime - itemTime
 
-      eventSource.changeEventDate(item, delta);
+        if (direction === 'right') {
+          // change endTime
+          eventSource.changeEventEndTime(item, delta)
+        } else {
+          // change startTime
+          eventSource.changeEventStartTime(item, delta)
+        }
+      }
     }
   }
 

@@ -68,12 +68,18 @@ $minheight: 100px;
       display: none;
     }
   }
-  & .right-drag {
+
+  & ._stretch {
     min-width: 15px;
-    &.hastrail {
-      display: none;
+    cursor: col-resize;
+    &.right {
+      cursor: e-resize;
+    }
+    &.left {
+      cursor: w-resize;
     }
   }
+
   & .event-content {
     flex: 1;
   }
@@ -110,3 +116,4 @@ $minheight: 100px;
   display: flex;
   margin-bottom: 20px;
 }
+

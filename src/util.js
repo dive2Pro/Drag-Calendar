@@ -51,7 +51,7 @@ export const sortByStartTimeOrLastTime = (a, b) => {
 
 export const hasHead = (event, time) => {
   const hashead = event.startTime < time;
-  return hashead ? " hashead " : "";
+  return hashead ? " hashead " : " ";
 };
 
 export const hasTrail = (event, time) => {

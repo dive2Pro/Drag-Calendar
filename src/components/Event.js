@@ -1,8 +1,9 @@
-import React, { PureComponent } from 'react'
-import {DragSource} from 'react-dnd'
-import { hasHead , hasTrail} from '../util'
-import {ItemTypes, rows, EventEnum} from '../constants'
-import { eventSource } from '../provider'
+import React, { PureComponent } from "react";
+import { DragSource } from "react-dnd";
+import { hasHead, hasTrail } from "../util";
+import { ItemTypes, rows, EventEnum } from "../constants";
+import { eventSource } from "../provider";
+import { StretchPart } from "./StretchPart";
 const EventDragSource = {
   beginDrag(props) {
     const { e, time } = props;
@@ -48,12 +49,13 @@ function collect(connect, monitor) {
 }
 
 @DragSource(ItemTypes.EVENT, EventDragSource, collect)
-
 export class Event extends React.PureComponent {
   componentDidMount() {}
 
   render() {
     const { e, time, isDragging, connectDragSource } = this.props;
+    const canTrailStretch = hasTrail(e, time) === " ";
+    const canHeadStretch = hasHead(e, time) === " ";
     return connectDragSource(
       <div
         key={e.id}
@@ -69,12 +71,12 @@ export class Event extends React.PureComponent {
           "event" + hasHead(e, time) + hasTrail(e, time) + " " + e.type
         }
       >
-        <div className={hasHead(e, time) + " left-drag"}> </div>
+        {canHeadStretch && <StretchPart e={e} direction="left" time={time} />}
         <div className={"event-content"}>
           {hasHead(e, time) !== "!" && e.content}
           - - {e.index}
         </div>
-        <div className={" right-drag " + hasTrail(e, time)} />
+        {canTrailStretch && <StretchPart e={e} direction="right" time={time} />}
       </div>
     );
   }

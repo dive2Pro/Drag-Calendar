@@ -1,7 +1,6 @@
 import { Container } from "unstated";
-import {EventEnum} from './constants'
+import { EventEnum } from "./constants";
 import cloneDeep from "lodash.clonedeep";
-
 
 const _processState = newState => {
   const Day1 = new Date(
@@ -16,7 +15,6 @@ const _processState = newState => {
   // log(newState, " = newState");
   return newState;
 };
-
 
 class DateSource extends Container {
   constructor() {
@@ -159,7 +157,7 @@ class EventSource extends Container {
       content: "TEMP@",
       type: EventEnum.temp
     });
-    this.state.data.push(this._temp)
+    this.state.data.push(this._temp);
     // 直接修改 不通过 setState 通知修改, 免除的这一次更新会使 "第二行"的 drag 事件不会因为 dom 重新生成而导致 dragend
   };
 
@@ -177,7 +175,7 @@ class EventSource extends Container {
    * @param {monitor.getItem()} item
    * @param {number} delta
    */
-  changeEventDate({id, startTime, endTime }, delta) {
+  changeEventDate({ id, startTime, endTime }, delta) {
     const newData = this.state.data.map(e => {
       if (e.id == id) {
         // const { startTime, endTime } = e;
@@ -190,15 +188,36 @@ class EventSource extends Container {
       data: newData
     });
   }
-  setOriginalTime(e) {
+  changeEventEndTime(item, delta) {
+    if (item.endTime + delta > item.startTime) {
+      const newData = this.state.data.map( e => {
+        if (e.id == item.id ) {
+          return {...e, endTime: item.endTime + delta}
+        }
+        return e
+      })
+
+      this.setState({
+        data: newData
+      })
+    }
+  }
+  changeEventStartTime(item, delta) {
+    if (item.startTime + delta < item.endTime) {
+      const newData = this.state.data.map( e => {
+        if (e.id == item.id ) {
+          return {...e, startTime: item.startTime + delta}
+        }
+        return e
+      })
+
+      this.setState({
+        data: newData
+      })
+    }
   }
 }
 const eventSource = new EventSource();
 const datesourceShared = new DateSource();
 
-export {
-  datesourceShared,
-  DateSource,
-  eventSource,
-  EventSource
-}
+export { datesourceShared, DateSource, eventSource, EventSource };
