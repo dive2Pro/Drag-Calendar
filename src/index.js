@@ -37,9 +37,9 @@ class DateSource extends Container {
 const datesourceShared = new DateSource();
 
 const EventEnum = {
-  data: "_data",
-  hover: "_hover",
-  temp: "_temp"
+  data: "B_data",
+  hover: "A_hover",
+  temp: "C_temp"
 };
 class EventSource extends Container {
   constructor() {
@@ -63,7 +63,7 @@ class EventSource extends Container {
         {
           id: 1,
           type: EventEnum.data,
-          startTime: new Date("2018-4-2").getTime(),
+          startTime: new Date("2018-4-4").getTime(),
           endTime: new Date("2018-4-15").getTime(),
           content: "play Music"
         },
@@ -145,14 +145,13 @@ class EventSource extends Container {
     // log( JSON.stringify (this.state.data))
     // e.type = type
     const newData = this.state.data.map(
-      ev => (ev.id === e.id ? { ...e, type } : ev)
+      ev => (ev.id === e.id ? { ...ev, type } : ev)
     );
-    log(newData)
     this.setState({ data: newData });
     // log( JSON.stringify (this.state.data))
   }
   generateTempOne = e => {
-    this._temp = cloneDeep({ ...e, id: e.id + "_temp", type: EventEnum.temp });
+    this._temp = cloneDeep({ ...e, id: e.id + "_temp", content: 'TEMP@', type: EventEnum.temp });
     this.state.data.push(this._temp);
     this.setState({ data: this.state.data });
   };
@@ -165,6 +164,25 @@ class EventSource extends Container {
       this._temp = null;
     }
   };
+  /**
+   *  根据 delta 修改事件的 起止时间
+   * 
+   * @param {string} id 
+   * @param {number} delta 
+   */
+  changeEventDate(id, delta) {
+    const newData = this.state.data.map(e => {
+      if (e.id == id) {
+        const { startTime, endTime } = e
+        return {...e, startTime: startTime + delta, endTime: endTime + delta}
+      }
+
+      return e
+    })
+    this.setState({
+      data: newData
+    })
+  }
 }
 const eventSource = new EventSource();
 
@@ -187,33 +205,39 @@ const ItemTypes = {
 
 const EventDragSource = {
   beginDrag(props) {
-    const { e } = props;
+    const { e, time } = props;
     // eventSource.generateTempOne(e)
-    log(e, ' --')
+    log(e, " --");
+    // const _temp = cloneDeep({ ...e, id: e.id + "_temp", type: EventEnum.temp });
+    // const newData = eventSource.state.data;
+    // newData.push(_temp);
+    // eventSource.setState({
+    //   data: newData.map(ev => (ev.id === e.id ? { ...e, type: EventEnum.hover } : ev))
+    // });
+    // eventSource.changeEventState(e, EventEnum.hover);
     eventSource.generateTempOne(e);
 
-    eventSource.changeEventState(e, EventEnum.hover);
     return {
-      id: e.id
+      id: e.id,
+      time
     };
   },
   endDrag(props, monitor, component) {
-    log(monitor.didDrop() , ' = didDrop')
+    // log(monitor.didDrop() , ' = didDrop')
+    // throw new Error('---')
     const { e } = props;
-    
+
     if (!monitor.didDrop()) {
       // You can check whether the drop was successful
       // or if the drag ended but nobody handled the drop
-    
       // return;
     }
-    
+
     eventSource.removeTempOne();
     eventSource.changeEventState(e, EventEnum.data);
- 
   },
   isDragging(props, monitor) {
-    log('isDragging   ' , monitor.getItem(), props.e.id);
+    // log('isDragging   ' , monitor.getItem(), props.e.id);
     return props.e.id === monitor.getItem().id;
   }
 };
@@ -247,8 +271,15 @@ const sortByStartTime = (a, b) => {
 
 const sortByIndex = (a, b) => a.index - b.index;
 
+const sortByEventEnum = (a, b) => {
+  return a.type.localeCompare(b.type);
+};
+
 const sortByStartTimeOrLastTime = (a, b) => {
   if (a.startTime === b.startTime) {
+    if (b.endTime === a.endTime) {
+      return sortByEventEnum(a, b);
+    }
     return b.endTime - a.endTime;
   } else {
     return a.startTime - b.startTime;
@@ -302,6 +333,7 @@ const sortEvent = (changeIndex, events, time) => {
       // 在每周日, 检查 fiveStar 和 fourStar 的 index
       // fiveStar 根据 起止 时间排序
       fiveStar = fiveStar.sort(sortByStartTimeOrLastTime);
+
       fiveStar.forEach((e, i) => {
         changeIndex(e, i);
       });
@@ -325,6 +357,8 @@ const sortEvent = (changeIndex, events, time) => {
   // 如果 index 和 高星有冲突
   // 变成  [1, 3, 4]
   const highStar = fiveStar.concat(fourStar).sort(sortByIndex);
+  threeStar = threeStar.sort(sortByStartTimeOrLastTime);
+  twoStar = twoStar.sort(sortByStartTimeOrLastTime);
   let lowStar = threeStar.concat(twoStar);
 
   lowStar.forEach(e => {
@@ -396,12 +430,8 @@ const sortEvent = (changeIndex, events, time) => {
   if (lowStar.length) {
     lowStar.forEach(addToResult);
   }
-  // [0, undefined, 2]
-  // log(result.length, events)
   // logGroup("result", result , events)
   return result;
-
-  // return events.sort((a, b) => a.index - b.index);
 };
 
 const hasHead = (event, time) => {
@@ -421,9 +451,14 @@ class Event extends React.PureComponent {
     const div = document.createElement("span");
     // this.props.connectDragPreview(div);
   }
+
+  componentWillUnmount() {
+    // log(` am out , ${this.props}`)
+  }
+
   render() {
     const { e, time, isDragging, connectDragSource } = this.props;
-    return connectDragSource (
+    return connectDragSource(
       <div
         key={e.id}
         data-time={e.startTime}
@@ -452,12 +487,21 @@ class Event extends React.PureComponent {
 const eventItemTarget = {
   drop(props, monitor, component) {
     if (monitor.didDrop()) {
-
-
     }
 
+    // drag item { id, time}
     const item = monitor.getItem();
-    log(item, props)
+    // 拿到 event
+
+    // props time 
+    const {time: dropTime } = props
+    // 比较 time 和 drop time  = delta
+    const delta = dropTime - item.time
+    // delta 应用到 event 的 startTime 和 endTime
+  logGroup("drop end ", delta)   
+    
+    eventSource.changeEventDate(item.id, delta)
+    // drop 完成后,
     return {
       moved: true
     };
@@ -471,7 +515,7 @@ const dropCollect = (connect, monitor) => {
     canDrop: monitor.canDrop()
   };
 };
-// @DropTarget(ItemTypes.EVENT, eventItemTarget, dropCollect)
+@DropTarget(ItemTypes.EVENT, eventItemTarget, dropCollect)
 class Item extends React.PureComponent {
   componentDidUpdate() {}
   render() {
@@ -503,7 +547,7 @@ class Item extends React.PureComponent {
         const found = sortedEvents.find(e => e.index == i);
         if (found) {
           events[i] = (
-            <Event key={found.id + " - " + i} e={found} time={time} />
+            <Event key={found.id + " - "} e={found} time={time} />
           );
         } else {
           // 检查:
@@ -519,7 +563,7 @@ class Item extends React.PureComponent {
       }
     }
 
-    return (
+    return connectDropTarget(
       <div className={"__calendar_item " + className}>
         <div>{getDayOfMonth(time)}</div>
         <div className={`__item_events`}>{events}</div>
@@ -666,6 +710,7 @@ class Week extends React.PureComponent {
         <Subscribe to={[eventSource]}>
           {({ state, changeIndex }) => {
             this._data = cloneDeep(state.data);
+            log("__deep");
             return Children.map(this.props.children, function map(child) {
               return React.cloneElement(child, {
                 changeIndex: self._changeIndex,
