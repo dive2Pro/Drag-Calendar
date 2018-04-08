@@ -40,6 +40,9 @@ $minheight: 100px;
     @include flexColumnCenter();
     &:nth-child(n) {
     }
+    &._active {
+      background: red;
+    }
   }
 }
 .__item_events {
@@ -47,6 +50,7 @@ $minheight: 100px;
   flex-direction: column;
   width: 100%;
   align-items: center;
+
 }
 
 .event {
@@ -57,7 +61,6 @@ $minheight: 100px;
   &.hashead {
     border-left: none;
   }
-
   &.hastrail {
     border-right: none;
   }

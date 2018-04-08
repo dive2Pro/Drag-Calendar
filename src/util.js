@@ -69,7 +69,9 @@ export const hasTrail = (event, time) => {
  */
 export const hasActive = (activeRange, time) => {
   if (Array.isArray(activeRange)) {
+    logGroup(" hasActive ", activeRange, time)
     if (time <= activeRange[1] && time >= activeRange[0]) {
+      // debugger
       return " _active ";
     }
   }

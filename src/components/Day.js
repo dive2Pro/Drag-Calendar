@@ -28,16 +28,6 @@ const eventItemTarget = {
 
       eventSource.changeEventDate(item, delta);
     } else if (draggingType === ItemTypes.EMPTY) {
-      const activeRange = datesourceShared.getActiveRange();
-      if (activeRange) {
-        const newEvent = {
-          startTime: activeRange[0],
-          endTime: activeRange[1],
-          type: EventEnum.new
-        };
-        eventSource.createNewOne(newEvent);
-      }
-      datesourceShared.resetActiveRange();
     }
     // drop 完成后,
     return {
@@ -142,7 +132,7 @@ export class Day extends React.PureComponent {
         }
       }
     }
-
+    log(activeRange)
     return connectDropTarget(
       <div
         className={

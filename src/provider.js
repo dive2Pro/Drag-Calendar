@@ -1,7 +1,7 @@
 import { Container } from "unstated";
 import { EventEnum, DefaultActiveRange } from "./constants";
 import cloneDeep from "lodash.clonedeep";
-import { geneNewId } from "./util";
+import { geneNewId, logGroup } from "./util";
 
 const _processState = newState => {
   const Day1 = new Date(
@@ -22,9 +22,6 @@ class DateSource extends Container {
     // null | [ startTime, endTime ] 
     activeRange: DefaultActiveRange
   };
-  constructor() {
-    super();
-  }
   init(props) {
     const date = new Date(props.showDate);
     let newState = {};
@@ -47,6 +44,7 @@ class DateSource extends Container {
     if (parseInt(time1) > parseInt(time2)){
       ([time2, time1] = [time1, time2] )
     }
+    // logGroup(" set active Range", time1, time2)
     this.setState({
       activeRange: [time1, time2]
     })
