@@ -34,10 +34,10 @@ const eventItemTarget = {
           startTime: activeRange[0],
           endTime: activeRange[1],
           type: EventEnum.new
-        }
-        eventSource.createNewOne(newEvent)
+        };
+        eventSource.createNewOne(newEvent);
       }
-        datesourceShared.resetActiveRange();
+      datesourceShared.resetActiveRange();
     }
     // drop 完成后,
     return {
@@ -92,7 +92,13 @@ export class Day extends React.PureComponent {
       }
     }
   }
-
+  _handleCreate = () => {
+    const { time } = this.props
+    eventSource.createNewOne({
+      startTime: time,
+      endTime: time
+    })
+  };
   render() {
     const {
       className = "",
@@ -127,7 +133,11 @@ export class Day extends React.PureComponent {
           events[i] = <Event key={found.id + " - "} e={found} time={time} />;
         } else {
           events[i] = (
-            <EmptyPart key={i + "_empty " + time} time={time} />
+            <EmptyPart
+              key={i + "_empty " + time}
+              time={time}
+              onCreate={this._handleCreate}
+            />
           );
         }
       }
@@ -141,7 +151,7 @@ export class Day extends React.PureComponent {
       >
         <div>{getDayOfMonth(time)}</div>
         <div className={`__item_events`}>{events}</div>
-        <EmptyPart time={time} />
+        <EmptyPart time={time} onCreate={this._handleCreate} />
       </div>
     );
   }

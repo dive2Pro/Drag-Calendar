@@ -22,8 +22,9 @@ const collect = (connect, monitor) => {
 @DragSource(ItemTypes.EMPTY, spec, collect)
 export class EmptyPart extends PureComponent {
   render() {
-    const { isDragging, connectDragSource} = this.props
+    const { isDragging, connectDragSource, onCreate} = this.props
     return connectDragSource(<div
+    onDoubleClick={onCreate}
     style={{
       opacity: isDragging ? 0.5 : 1
     }}

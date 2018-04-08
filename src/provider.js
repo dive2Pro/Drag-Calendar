@@ -241,7 +241,8 @@ class EventSource extends Container {
   createNewOne = (obj) => {
     const newOne =  {
       id: geneNewId(),
-      ...obj
+      ...obj,
+      type: EventEnum.new
     }
     this.state.data.push(newOne)
     this.setState({data: this.state.data})

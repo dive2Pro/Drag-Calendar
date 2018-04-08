@@ -100,8 +100,7 @@
 
   1. ~~取消 event data 中的 index 属性, 改为 渲染前计算~~. 不修改 event 中的 data, 而是在 Week 中复制 data, 计算后赋值 index, 在本周中的 Day 都以改 index 为值来计算
 
-
 - [ ] 处理空白位置 响应 mouse 事件
-  - [ ] double click
+  - [x] double click
   - [x] 划拉一段, 生成一个事件, 以 这段为起止时间
   - [ ] edit 接口
