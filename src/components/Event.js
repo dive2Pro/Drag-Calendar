@@ -8,7 +8,6 @@ const EventDragSource = {
   beginDrag(props) {
     const { e, time } = props;
     eventSource.generateTempOne(e);
-    eventSource.setOriginalTime(e);
     return {
       id: e.id,
       time,
@@ -17,8 +16,6 @@ const EventDragSource = {
     };
   },
   endDrag(props, monitor, component) {
-    // log(monitor.didDrop() , ' = didDrop')
-    // throw new Error('---')
     const { e } = props;
 
     if (!monitor.didDrop()) {

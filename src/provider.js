@@ -1,6 +1,7 @@
 import { Container } from "unstated";
-import { EventEnum } from "./constants";
+import { EventEnum, DefaultActiveRange } from "./constants";
 import cloneDeep from "lodash.clonedeep";
+import { geneNewId } from "./util";
 
 const _processState = newState => {
   const Day1 = new Date(
@@ -17,10 +18,12 @@ const _processState = newState => {
 };
 
 class DateSource extends Container {
+  state = {
+    // null | [ startTime, endTime ] 
+    activeRange: DefaultActiveRange
+  };
   constructor() {
     super();
-    this.state = {};
-    this.change = this.change.bind(this);
   }
   init(props) {
     const date = new Date(props.showDate);
@@ -29,7 +32,7 @@ class DateSource extends Container {
     newState.currentMonth = date.getMonth();
     this.change(newState);
   }
-  change(state, cb) {
+  change = (state, cb) =>  {
     let newState = state;
     const prev = this.state;
     if (typeof state === "function") {
@@ -38,6 +41,24 @@ class DateSource extends Container {
     newState = Object.assign({}, prev.state, newState);
     newState = _processState(newState);
     this.setState(newState);
+  }
+
+  setActiveRange = (time1, time2) => {
+    if (parseInt(time1) > parseInt(time2)){
+      ([time2, time1] = [time1, time2] )
+    }
+    this.setState({
+      activeRange: [time1, time2]
+    })
+  }
+
+  resetActiveRange = () => {
+    this.setState({
+      activeRange: DefaultActiveRange
+    })
+  }
+  getActiveRange = () => {
+    return this.state.activeRange
   }
 }
 
@@ -190,31 +211,40 @@ class EventSource extends Container {
   }
   changeEventEndTime(item, delta) {
     if (item.endTime + delta > item.startTime) {
-      const newData = this.state.data.map( e => {
-        if (e.id == item.id ) {
-          return {...e, endTime: item.endTime + delta}
+      const newData = this.state.data.map(e => {
+        if (e.id == item.id) {
+          return { ...e, endTime: item.endTime + delta };
         }
-        return e
-      })
+        return e;
+      });
 
       this.setState({
         data: newData
-      })
+      });
     }
   }
   changeEventStartTime(item, delta) {
     if (item.startTime + delta < item.endTime) {
-      const newData = this.state.data.map( e => {
-        if (e.id == item.id ) {
-          return {...e, startTime: item.startTime + delta}
+      const newData = this.state.data.map(e => {
+        if (e.id == item.id) {
+          return { ...e, startTime: item.startTime + delta };
         }
-        return e
-      })
+        return e;
+      });
 
       this.setState({
         data: newData
-      })
+      });
     }
+  }
+
+  createNewOne = (obj) => {
+    const newOne =  {
+      id: geneNewId(),
+      ...obj
+    }
+    this.state.data.push(newOne)
+    this.setState({data: this.state.data})
   }
 }
 const eventSource = new EventSource();

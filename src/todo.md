@@ -1,4 +1,4 @@
-- [ ] 处理 "事件"
+- [x] 处理 "事件"
       事件 : {
         mode: "temp" | "data" !default
         startTime 
@@ -25,8 +25,8 @@
           content: 'eat'
         }
       ]
-- [ ] 处理拖拽
-      1. [ ] 方向
+- [x] 处理拖拽
+      1. [x] 方向
             每一个 DataSquare 都有自己的 time,
             记录点击时的位置 (time)
             点击时的 event ( id )
@@ -43,9 +43,9 @@
                 1. 删除 temp event
                 2. 修改 hover event 为 data event
 
-      2. [ ] 记录拖拽 handle 位置, 该位置的移动会 使 事件中其他日期的位置 跟着相对变化
+      2. [x] 记录拖拽 handle 位置, 该位置的移动会 使 事件中其他日期的位置 跟着相对变化
             由 item 实现
-      3. [ ] 拖拽时 有阴影
+      3. [x] 拖拽时 有阴影
             由 hover event实现
     [x] bug : 
       当 drag 事件的第二行时, endDrag 立即被 call****
@@ -99,3 +99,9 @@
 考虑:
 
   1. ~~取消 event data 中的 index 属性, 改为 渲染前计算~~. 不修改 event 中的 data, 而是在 Week 中复制 data, 计算后赋值 index, 在本周中的 Day 都以改 index 为值来计算
+
+
+- [ ] 处理空白位置 响应 mouse 事件
+  - [ ] double click
+  - [x] 划拉一段, 生成一个事件, 以 这段为起止时间
+  - [ ] edit 接口

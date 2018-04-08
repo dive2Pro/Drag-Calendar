@@ -1,3 +1,5 @@
+const  uniqid = require('uniqid');
+
 export const logGroup = (title, ...args) => {
   console.group(title);
   log(args);
@@ -6,7 +8,6 @@ export const logGroup = (title, ...args) => {
 export const log = console.log.bind(console);
 const dayMilliseconds = 86400000;
 
-
 export const plusDays = days => {
   return dayMilliseconds * days;
 };
@@ -14,7 +15,6 @@ export const plusDays = days => {
 export const minusDays = days => {
   return -1 * dayMilliseconds * days;
 };
-
 
 const helperDate = new Date();
 
@@ -59,3 +59,23 @@ export const hasTrail = (event, time) => {
 
   return hastrail ? " hastrail " : " ";
 };
+
+// export const isInthe
+/**
+ *
+ * @param {null | number[]} activeRange
+ * @param {string} time
+ * @return " _active " | " "
+ */
+export const hasActive = (activeRange, time) => {
+  if (Array.isArray(activeRange)) {
+    if (time <= activeRange[1] && time >= activeRange[0]) {
+      return " _active ";
+    }
+  }
+  return " ";
+};
+
+export const geneNewId = (...args) => {
+  return uniqid()
+}

@@ -30,7 +30,8 @@ class Week extends React.PureComponent {
             return Children.map(this.props.children, function map(child) {
               return React.cloneElement(child, {
                 changeIndex: self._changeIndex,
-                data: self._data
+                data: self._data,
+                ...self.props
               });
             });
           }}
@@ -48,7 +49,7 @@ export class Days extends React.PureComponent {
       <Subscribe to={[datesourceShared]}>
         {dateSource => {
           const days = [];
-          const { dayoffset, day1Time } = dateSource.state;
+          const { dayoffset, day1Time, activeRange } = dateSource.state;
           let _dayOff = dayoffset;
           let weeks = [];
 
@@ -72,7 +73,7 @@ export class Days extends React.PureComponent {
                 );
               }
             }
-            weeks.push(<Week key={i + " week- "}>{week}</Week>);
+            weeks.push(<Week key={i + " week- "} activeRange={activeRange} >{week}</Week>);
           }
           return <React.Fragment> {weeks} </React.Fragment>;
         }}
