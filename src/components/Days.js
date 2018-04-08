@@ -26,7 +26,6 @@ class Week extends React.PureComponent {
         <Subscribe to={[eventSource]}>
           {({ state, changeIndex }) => {
             this._data = cloneDeep(state.data);
-            log("__deep");
             return Children.map(this.props.children, function map(child) {
               return React.cloneElement(child, {
                 changeIndex: self._changeIndex,
@@ -42,8 +41,6 @@ class Week extends React.PureComponent {
 }
 
 export class Days extends React.PureComponent {
-
-  
   render() {
     return (
       <Subscribe to={[datesourceShared]}>
@@ -52,23 +49,28 @@ export class Days extends React.PureComponent {
           const { dayoffset, day1Time, activeRange } = dateSource.state;
           let _dayOff = dayoffset;
           let weeks = [];
-
+          let time 
           for (let i = 0; i < rows; i++) {
             let week = [];
+            
             for (let c = 0; c < columns; c++) {
               if (_dayOff != 0) {
+                time = day1Time + minusDays(_dayOff)
                 week.push(
                   <Day
                     key={"prev - " + i + " - " + c}
-                    time={day1Time + minusDays(_dayOff)}
+                    time={time}
+                    isCurrentMonth={dateSource.isCurrentMonth(time)}
                   />
                 );
                 _dayOff -= 1;
               } else {
+                time = day1Time + plusDays(c + i * 7 - dayoffset)
                 week.push(
                   <Day
                     key={i + " now " + c}
-                    time={day1Time + plusDays(c + i * 7 - dayoffset)}
+                    time={time}
+                    isCurrentMonth={dateSource.isCurrentMonth(time)}
                   />
                 );
               }

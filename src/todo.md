@@ -104,7 +104,7 @@
   - [x] double click
   - [x] 划拉一段, 生成一个事件, 以 这段为起止时间
   - [ ] edit 接口
-
+        
 - [ ] style
     [ ] 修改 drag 时 preview  
     [ ] 修改样式

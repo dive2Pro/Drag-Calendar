@@ -1,7 +1,7 @@
 import { Container } from "unstated";
 import { EventEnum, DefaultActiveRange } from "./constants";
 import cloneDeep from "lodash.clonedeep";
-import { geneNewId, logGroup } from "./util";
+import { geneNewId, logGroup, helperDate } from "./util";
 
 const _processState = newState => {
   const Day1 = new Date(
@@ -29,7 +29,8 @@ class DateSource extends Container {
     newState.currentMonth = date.getMonth();
     this.change(newState);
   }
-  change = (state, cb) =>  {
+
+  change = (state) =>  {
     let newState = state;
     const prev = this.state;
     if (typeof state === "function") {
@@ -57,6 +58,16 @@ class DateSource extends Container {
   }
   getActiveRange = () => {
     return this.state.activeRange
+  }
+  isCurrentMonth = (time) => {
+    const { currentYear, currentMonth } = this.state
+    helperDate.setFullYear(currentYear)
+
+    const startTime = helperDate.setMonth(currentMonth, 0)
+
+    const endTime =  helperDate.setMonth(currentMonth + 1, 0)
+    // logGroup(' is current month ', startTime, endTime, time)
+    return time >= startTime && time <= endTime
   }
 }
 

@@ -16,11 +16,11 @@ export const minusDays = days => {
   return -1 * dayMilliseconds * days;
 };
 
-const helperDate = new Date();
+export const helperDate = new Date();
 
 export const getDayOfMonth = time => {
   helperDate.setTime(time);
-  return helperDate.getDate();
+  return helperDate.getDate() + "日";
 };
 
 export const getDayOfWeek = time => {
@@ -81,3 +81,4 @@ export const hasActive = (activeRange, time) => {
 export const geneNewId = (...args) => {
   return uniqid()
 }
+

@@ -11,26 +11,23 @@ console.clear();
 
 @DragDropContext(HTML5Backend)
 class Calender extends React.PureComponent {
+  constructor(props) {
+    super(props)
+    datesourceShared.init(props);
+  }
   render() {
     return (
-      <section className="__calendar">
-        <Title />
-        <Headers />
-        <div className="_calendar_content">
-          <Days />
-        </div>
-      </section>
+      <UnStatedProvider>
+        <section className="__calendar">
+          <Title />
+          <Headers />
+          <div className="_calendar_content">
+            <Days />
+          </div>
+        </section>
+      </UnStatedProvider>
     );
   }
 }
 
-const Root = props => {
-  datesourceShared.init(props);
-  return (
-    <UnStatedProvider>
-      <Calender />
-    </UnStatedProvider>
-  );
-};
-
-render(<Root showDate={"2018/4/1"} />, document.getElementById("root"));
+render(<Calender showDate={"2018/4/1"} />, document.getElementById("root"));

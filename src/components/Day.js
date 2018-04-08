@@ -51,6 +51,7 @@ const dropCollect = (connect, monitor) => {
   dropCollect
 )
 export class Day extends React.PureComponent {
+
   componentDidUpdate(prevProps) {
     if (!prevProps.isOver && this.props.isOver) {
       const { monitor, draggingType } = this.props;
@@ -98,7 +99,8 @@ export class Day extends React.PureComponent {
       connectDropTarget,
       isOver,
       canDrop,
-      activeRange
+      activeRange,
+      isCurrentMonth
     } = this.props;
 
     if (typeof data.filter !== "function") {
@@ -132,11 +134,14 @@ export class Day extends React.PureComponent {
         }
       }
     }
-    log(activeRange)
+
     return connectDropTarget(
       <div
         className={
-          "__calendar_item " + className + hasActive(activeRange, time)
+          (isCurrentMonth ? '_current_month ' : ' ')
+          +  "__calendar_day " 
+          + className 
+          + hasActive(activeRange, time)
         }
       >
         <div>{getDayOfMonth(time)}</div>

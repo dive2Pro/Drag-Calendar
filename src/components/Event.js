@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { DragSource } from "react-dnd";
-import { hasHead, hasTrail } from "../util";
+import { hasHead, hasTrail, logGroup } from "../util";
 import { ItemTypes, rows, EventEnum } from "../constants";
 import { eventSource } from "../provider";
 import { StretchPart } from "./StretchPart";
@@ -49,6 +49,13 @@ function collect(connect, monitor) {
 export class Event extends React.PureComponent {
   componentDidMount() {}
 
+  _handleClick = () => {
+    const { e, time, onEventEdit } = this.props
+    logGroup(' event clicked ')
+    if (onEventEdit){
+      onEventEdit(e, time)
+    }
+  }
   render() {
     const { e, time, isDragging, connectDragSource } = this.props;
     const canTrailStretch = hasTrail(e, time) === " ";
@@ -67,6 +74,7 @@ export class Event extends React.PureComponent {
         className={
           "event" + hasHead(e, time) + hasTrail(e, time) + " " + e.type
         }
+        onClick={this._handleClick}
       >
         {canHeadStretch && <StretchPart e={e} direction="left" time={time} />}
         <div className={"event-content"}>
