@@ -55,7 +55,7 @@ export class Event extends React.PureComponent {
 
   _handleClick = event => {
     const { e, time, onEventEdit } = this.props;
-    eventSource.setEditing(e, time);
+    eventSource.setEditing(e.id, time);
     if (onEventEdit) {
       // onEventEdit(event, e, time);
     }
@@ -70,10 +70,11 @@ export class Event extends React.PureComponent {
     const canTrailStretch = hasTrail(e, time) === " ";
     const canHeadStretch = hasHead(e, time) === " ";
 
+    const isTooltipVisible = eventSource.isEditingEvent(e, time) 
     return (
       <Tooltip
-        visible={eventSource.isEditingEvent(e, time) }
-        overlay={<span>tooltip</span>}
+        visible={isTooltipVisible}
+        overlay={ isTooltipVisible && eventSource.renderEditForm()}
         getTooltipContainer={() => this.state.dom}
         placement="right"
         style={{zIndex: 2}}

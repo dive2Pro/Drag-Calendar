@@ -3,9 +3,9 @@ import React, { PureComponent , Children } from 'react'
 import { Subscribe } from "unstated";
 import { datesourceShared, eventSource } from "../provider";
 import { Day } from './Day'
-import cloneDeep from 'lodash.cloneDeep'
 import { rows , columns } from '../constants'
 import { plusDays, minusDays, log, logGroup} from '../util'
+const cloneDeep = require('lodash.clonedeep')
 
 class Week extends React.PureComponent {
   _emptys = [];

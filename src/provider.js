@@ -2,8 +2,9 @@ import React, { PureComponent } from "react";
 
 import { Container } from "unstated";
 import { EventEnum, DefaultActiveRange } from "./constants";
-import cloneDeep from "lodash.clonedeep";
+
 import { geneNewId, logGroup, helperDate } from "./util";
+const cloneDeep = require("lodash.clonedeep");
 
 const _processState = newState => {
   const Day1 = new Date(
@@ -333,10 +334,10 @@ class EventSource extends Container {
     this.setState({ data: newData });
     this.triggerCbs(EventPerformTypes.Remove, event);
   };
-  setEditing = (e, time) => {
+  setEditing = (id, time) => {
     this.setState({
       editing: {
-        e,
+        eventId: id,
         time
       }
     });
@@ -345,7 +346,7 @@ class EventSource extends Container {
   isEditingEvent = (e, time) => {
     return (
       this.state.editing &&
-      this.state.editing.e.id == e.id &&
+      this.state.editing.eventId == e.id &&
       this.state.editing.time == time
     );
   };
@@ -363,17 +364,17 @@ class EventSource extends Container {
     args.removeOne = this.removeOne;
     args.handleClose = this.cleanEditing;
     args.changeEvent = this.changeEvent;
-
-    Object.keys(this.state.editing).forEach(
-      name => (args[name] = this.state.editing[name])
-    );
-
+    if (!("e" in args)) {
+      args.e = this.state.data.find(e => e.id === this.state.editing.eventId);
+    }
     const rendered = this._performProps("renderForm", {
       ...args,
       handleClose: this.cleanEditing
     });
 
-    if (rendered && React.isValidElement(rendered)) {
+    if (!args.e) {
+      console.error(`args.e doesn't exits`, this.state);
+    } else if (rendered && React.isValidElement(rendered)) {
       this._rendered = rendered;
     } else {
       console.error(

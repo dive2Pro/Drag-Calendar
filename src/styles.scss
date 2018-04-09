@@ -225,4 +225,32 @@ $thirdColor: #9d9d9d;
 // tooltip
 
 .rc-tooltip{
+  min-width: 300px;
+  opacity: 1;
+  height: auto;
+  color: black;
+  &-content{
+    height: inherit;
+    background: inherit;
+  }
+  &-arrow{
+    border-right-color: white !important;
+    border-left-color: white !important;
+  }
+  &-inner{
+     background: white;
+    height: inherit;
+    color: inherit;
+    & .render-form{
+      &-content{
+        display: flex;
+        flex-direction: column;
+        padding: 20px 0 ;
+        align-content: space-between;
+        & > :nth-child(n) {
+          margin-bottom: 10px;
+        }
+      }
+    }
+  }
 }
