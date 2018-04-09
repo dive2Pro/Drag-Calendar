@@ -43,7 +43,6 @@ export class EmptyPart extends PureComponent {
         }}
         className="_empty-part"
       >
-        ____
       </div>
     );
   }

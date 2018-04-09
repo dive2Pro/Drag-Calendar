@@ -1,4 +1,4 @@
-const  uniqid = require('uniqid');
+const uniqid = require("uniqid");
 
 export const logGroup = (title, ...args) => {
   console.group(title);
@@ -55,7 +55,11 @@ export const hasHead = (event, time) => {
 };
 
 export const hasTrail = (event, time) => {
-  const hastrail = event.endTime > time + plusDays(1);
+  const _4_1 = helperDate.setMonth(3, 1)
+  if (_4_1 === time) {
+    // debugger
+  }
+  const hastrail = event.endTime >= time + plusDays(1);
 
   return hastrail ? " hastrail " : " ";
 };
@@ -69,7 +73,7 @@ export const hasTrail = (event, time) => {
  */
 export const hasActive = (activeRange, time) => {
   if (Array.isArray(activeRange)) {
-    logGroup(" hasActive ", activeRange, time)
+    logGroup(" hasActive ", activeRange, time);
     if (time <= activeRange[1] && time >= activeRange[0]) {
       // debugger
       return " _active ";
@@ -79,6 +83,12 @@ export const hasActive = (activeRange, time) => {
 };
 
 export const geneNewId = (...args) => {
-  return uniqid()
-}
+  return uniqid();
+};
 
+export const showContent = (e, time) => {
+  if (hasHead(e, time) == ' ' || getDayOfWeek(time) === 0  ) {
+    return e.content;
+  }
+  return null;
+};

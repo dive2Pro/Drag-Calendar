@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { DragSource } from "react-dnd";
-import { hasHead, hasTrail, logGroup } from "../util";
+import { hasHead, hasTrail, logGroup, showContent } from "../util";
 import { ItemTypes, rows, EventEnum } from "../constants";
 import { eventSource } from "../provider";
 import { StretchPart } from "./StretchPart";
@@ -50,12 +50,12 @@ export class Event extends React.PureComponent {
   componentDidMount() {}
 
   _handleClick = () => {
-    const { e, time, onEventEdit } = this.props
-    logGroup(' event clicked ')
-    if (onEventEdit){
-      onEventEdit(e, time)
+    const { e, time, onEventEdit } = this.props;
+    logGroup(" event clicked ");
+    if (onEventEdit) {
+      onEventEdit(e, time);
     }
-  }
+  };
   render() {
     const { e, time, isDragging, connectDragSource } = this.props;
     const canTrailStretch = hasTrail(e, time) === " ";
@@ -66,19 +66,21 @@ export class Event extends React.PureComponent {
         data-time={e.startTime}
         data-content={e.content}
         data-index={e.index}
-        style={{
-          backgroundColor: `hsla(${e.index * 30 + 50}, 100%, 50%, 0.32)`,
-          opacity: isDragging ? 0.5 : 1,
-          cursor: "move"
-        }}
         className={
           "event" + hasHead(e, time) + hasTrail(e, time) + " " + e.type
         }
         onClick={this._handleClick}
       >
         {canHeadStretch && <StretchPart e={e} direction="left" time={time} />}
-        <div className={"event-content"}>
-          {hasHead(e, time) !== "!" && e.content}
+        <div
+          className={"event-content"}
+          style={{
+            backgroundColor: `hsla(${e.index * 30 + 50}, 100%, 50%, 1)`,
+            opacity: isDragging ? 0.5 : 1,
+            cursor: "move"
+          }}
+        >
+          {showContent(e, time)}
           - - {e.index}
         </div>
         {canTrailStretch && <StretchPart e={e} direction="right" time={time} />}
