@@ -124,10 +124,6 @@ export class Day extends React.PureComponent {
           events[i] = (
             <React.Fragment key={found.id + " - "}>
               <Event e={found} time={time} />
-              <div className="_edit_form">
-                {eventSource.isEditingEvent(found) &&
-                  eventSource.renderEditForm()}
-              </div>
             </React.Fragment>
           );
         } else {

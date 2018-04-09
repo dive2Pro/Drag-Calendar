@@ -113,7 +113,7 @@
     1. 点击 event 时, 渲染 edit form
     2. editform 应该在点击位置打开 -- 计算位置
     3. editform 可以拿到 function(修改当前 event 的 data)
-    4.  修改后, 应该可以通过 props 告知
+    4. 修改后, 应该可以通过 props 告知
       - update
       - delete
       - create

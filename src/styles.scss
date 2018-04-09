@@ -114,7 +114,6 @@ $thirdColor: #9d9d9d;
     }
   }
   & ._edit_form{
-    height: 0;
     padding: 0;
   }
 }
@@ -220,4 +219,10 @@ $thirdColor: #9d9d9d;
   width: 100%;
   min-height: 22px;
   cursor: cell;
+}
+
+
+// tooltip
+
+.rc-tooltip{
 }

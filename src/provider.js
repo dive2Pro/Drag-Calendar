@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent } from "react";
 
 import { Container } from "unstated";
 import { EventEnum, DefaultActiveRange } from "./constants";
@@ -218,7 +218,7 @@ class EventSource extends Container {
     }
   };
 
-  changeEvent = ({id, ...rest}) => {
+  changeEvent = ({ id, ...rest }) => {
     let targetEvent;
     const newData = this.state.data.map(e => {
       if (e.id == id) {
@@ -236,7 +236,7 @@ class EventSource extends Container {
       data: newData
     });
     this.triggerCbs(EventPerformTypes.Update, targetEvent);
-  }
+  };
   /**
    *  根据 delta 修改事件的 起止时间
    *
@@ -251,7 +251,7 @@ class EventSource extends Container {
         targetEvent = {
           ...e,
           startTime: startTime + delta,
-          endTime: endTime + delta,
+          endTime: endTime + delta
         };
         return targetEvent;
       }
@@ -307,13 +307,13 @@ class EventSource extends Container {
   triggerCbs = (type, event) => {
     switch (type) {
       case EventPerformTypes.Create:
-        _performProps("onEventCreated", event);
+        this._performProps("onEventCreated", event);
         break;
       case EventPerformTypes.Update:
-        _performProps("onEventUpdated", event);
+        this._performProps("onEventUpdated", event);
         break;
       case EventPerformTypes.Remove:
-        _performProps("onEventRemoved", event);
+        this._performProps("onEventRemoved", event);
         break;
       default:
     }
@@ -333,16 +333,24 @@ class EventSource extends Container {
     this.setState({ data: newData });
     this.triggerCbs(EventPerformTypes.Remove, event);
   };
-  setEditing = e => {
+  setEditing = (e, time) => {
     this.setState({
-      editing: e
+      editing: {
+        e,
+        time
+      }
     });
   };
 
-  isEditingEvent = e => {
-    return this.state.editing && this.state.editing.id == e.id;
+  isEditingEvent = (e, time) => {
+    return (
+      this.state.editing &&
+      this.state.editing.e.id == e.id &&
+      this.state.editing.time == time
+    );
   };
-  cleanEditing = () => {
+
+  cleanEditing = time => {
     this.setState({
       editing: null
     });
@@ -350,24 +358,29 @@ class EventSource extends Container {
   };
 
   _rendered;
+
   renderEditForm = (args = {}) => {
-    if (this._rendered) {
-      return;
-    }
-    args.removeOne = this.removeOne
-    args.handleClose = this.cleanEditing
-    args.changeEvent = this.changeEvent
+    args.removeOne = this.removeOne;
+    args.handleClose = this.cleanEditing;
+    args.changeEvent = this.changeEvent;
+
+    Object.keys(this.state.editing).forEach(
+      name => (args[name] = this.state.editing[name])
+    );
 
     const rendered = this._performProps("renderForm", {
       ...args,
       handleClose: this.cleanEditing
     });
-    if (rendered && React.isValidElement(rendered)) {
 
+    if (rendered && React.isValidElement(rendered)) {
       this._rendered = rendered;
     } else {
-      console.error(`Please check the prop [renderForm], make sure it will return a Component`)
+      console.error(
+        `Please check the prop [renderForm], make sure it will return a Component`
+      );
     }
+
     return rendered;
   };
 }
