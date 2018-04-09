@@ -3,9 +3,10 @@ import { render } from "react-dom";
 import { Provider as UnStatedProvider } from "unstated";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
-import { datesourceShared } from "./provider";
+import { datesourceShared, eventSource } from "./provider";
 import { Headers, Title, Days } from "./components";
 import "./styles.scss";
+import { logGroup } from "./util";
 
 console.clear();
 
@@ -14,6 +15,7 @@ class Calender extends React.PureComponent {
   constructor(props) {
     super(props)
     datesourceShared.init(props);
+    eventSource.init(props)
   }
   render() {
     return (
@@ -30,4 +32,9 @@ class Calender extends React.PureComponent {
   }
 }
 
-render(<Calender showDate={"2018/4/1"} />, document.getElementById("root"));
+render(<Calender
+  renderForm={(...args) => {
+    logGroup(args)
+    return <div>Hello</div>
+  }}
+  showDate={"2018/4/1"} />, document.getElementById("root"));

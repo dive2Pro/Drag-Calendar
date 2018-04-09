@@ -1,3 +1,5 @@
+import React, { PureComponent } from 'react'
+
 import { Container } from "unstated";
 import { EventEnum, DefaultActiveRange } from "./constants";
 import cloneDeep from "lodash.clonedeep";
@@ -19,7 +21,7 @@ const _processState = newState => {
 
 class DateSource extends Container {
   state = {
-    // null | [ startTime, endTime ] 
+    // null | [ startTime, endTime ]
     activeRange: DefaultActiveRange
   };
   init(props) {
@@ -28,9 +30,10 @@ class DateSource extends Container {
     newState.currentYear = date.getFullYear();
     newState.currentMonth = date.getMonth();
     this.change(newState);
+    this._props = props;
   }
 
-  change = (state) =>  {
+  change = state => {
     let newState = state;
     const prev = this.state;
     if (typeof state === "function") {
@@ -39,38 +42,43 @@ class DateSource extends Container {
     newState = Object.assign({}, prev.state, newState);
     newState = _processState(newState);
     this.setState(newState);
-  }
+  };
 
   setActiveRange = (time1, time2) => {
-    if (parseInt(time1) > parseInt(time2)){
-      ([time2, time1] = [time1, time2] )
+    if (parseInt(time1) > parseInt(time2)) {
+      [time2, time1] = [time1, time2];
     }
     // logGroup(" set active Range", time1, time2)
     this.setState({
       activeRange: [time1, time2]
-    })
-  }
+    });
+  };
 
   resetActiveRange = () => {
     this.setState({
       activeRange: DefaultActiveRange
-    })
-  }
+    });
+  };
   getActiveRange = () => {
-    return this.state.activeRange
-  }
-  isCurrentMonth = (time) => {
-    const { currentYear, currentMonth } = this.state
-    helperDate.setFullYear(currentYear)
+    return this.state.activeRange;
+  };
+  isCurrentMonth = time => {
+    const { currentYear, currentMonth } = this.state;
+    helperDate.setFullYear(currentYear);
 
-    const startTime = helperDate.setMonth(currentMonth, 0)
+    const startTime = helperDate.setMonth(currentMonth, 0);
 
-    const endTime =  helperDate.setMonth(currentMonth + 1, 0)
+    const endTime = helperDate.setMonth(currentMonth + 1, 0);
     // logGroup(' is current month ', startTime, endTime, time)
-    return time >= startTime && time <= endTime
-  }
+    return time >= startTime && time <= endTime;
+  };
 }
 
+const EventPerformTypes = {
+  Update: "_event_Update",
+  Remove: "_event_Remove",
+  Create: "_event_Create"
+};
 class EventSource extends Container {
   constructor() {
     super();
@@ -165,7 +173,12 @@ class EventSource extends Container {
       ]
     };
   }
+
   _temp = null;
+
+  init = props => {
+    this._props = props;
+  };
   /**
    *
    * @param {event} e
@@ -174,11 +187,16 @@ class EventSource extends Container {
   changeEventState(e, type) {
     // log( JSON.stringify (this.state.data))
     // e.type = type
-    const newData = this.state.data.map(
-      ev => (ev.id === e.id ? { ...ev, type } : ev)
-    );
+    let targetEvent;
+    const newData = this.state.data.map(ev => {
+      if (ev.id === e.id) {
+        targetEvent = { ...ev, type };
+        return targetEvent;
+      }
+      return ev;
+    });
     this.setState({ data: newData });
-    // log( JSON.stringify (this.state.data))
+    this.triggerCbs(EventPerformTypes.Update, targetEvent);
   }
   generateTempOne = e => {
     this._temp = cloneDeep({
@@ -199,17 +217,17 @@ class EventSource extends Container {
       this._temp = null;
     }
   };
-  /**
-   *  根据 delta 修改事件的 起止时间
-   *
-   * @param {monitor.getItem()} item
-   * @param {number} delta
-   */
-  changeEventDate({ id, startTime, endTime }, delta) {
+
+  changeEvent = ({id, ...rest}) => {
+    let targetEvent;
     const newData = this.state.data.map(e => {
       if (e.id == id) {
         // const { startTime, endTime } = e;
-        return { ...e, startTime: startTime + delta, endTime: endTime + delta };
+        targetEvent = {
+          ...e,
+          ...rest
+        };
+        return targetEvent;
       }
 
       return e;
@@ -217,12 +235,41 @@ class EventSource extends Container {
     this.setState({
       data: newData
     });
+    this.triggerCbs(EventPerformTypes.Update, targetEvent);
+  }
+  /**
+   *  根据 delta 修改事件的 起止时间
+   *
+   * @param {monitor.getItem()} item
+   * @param {number} delta
+   */
+  changeEventDate({ id, startTime, endTime }, delta) {
+    let targetEvent;
+    const newData = this.state.data.map(e => {
+      if (e.id == id) {
+        // const { startTime, endTime } = e;
+        targetEvent = {
+          ...e,
+          startTime: startTime + delta,
+          endTime: endTime + delta,
+        };
+        return targetEvent;
+      }
+
+      return e;
+    });
+    this.setState({
+      data: newData
+    });
+    this.triggerCbs(EventPerformTypes.Update, targetEvent);
   }
   changeEventEndTime(item, delta) {
     if (item.endTime + delta > item.startTime) {
+      let targetEvent;
       const newData = this.state.data.map(e => {
         if (e.id == item.id) {
-          return { ...e, endTime: item.endTime + delta };
+          targetEvent = { ...e, endTime: item.endTime + delta };
+          return targetEvent;
         }
         return e;
       });
@@ -230,13 +277,16 @@ class EventSource extends Container {
       this.setState({
         data: newData
       });
+      this.triggerCbs(EventPerformTypes.Update, targetEvent);
     }
   }
   changeEventStartTime(item, delta) {
     if (item.startTime + delta < item.endTime) {
+      let targetEvent;
       const newData = this.state.data.map(e => {
         if (e.id == item.id) {
-          return { ...e, startTime: item.startTime + delta };
+          targetEvent = { ...e, startTime: item.startTime + delta };
+          return targetEvent;
         }
         return e;
       });
@@ -244,19 +294,84 @@ class EventSource extends Container {
       this.setState({
         data: newData
       });
+      this.triggerCbs(EventPerformTypes.Update, targetEvent);
     }
   }
-
-  createNewOne = (obj) => {
-    const newOne =  {
+  _performProps = (name, ...args) => {
+    const props = this._props;
+    if (props[name]) {
+      args.push(this.state.data);
+      return props[name].apply(null, args);
+    }
+  };
+  triggerCbs = (type, event) => {
+    switch (type) {
+      case EventPerformTypes.Create:
+        _performProps("onEventCreated", event);
+        break;
+      case EventPerformTypes.Update:
+        _performProps("onEventUpdated", event);
+        break;
+      case EventPerformTypes.Remove:
+        _performProps("onEventRemoved", event);
+        break;
+      default:
+    }
+  };
+  createNewOne = obj => {
+    const newOne = {
       id: geneNewId(),
       ...obj,
       type: EventEnum.new
+    };
+    this.state.data.push(newOne);
+    this.setState({ data: this.state.data });
+    this.triggerCbs(EventPerformTypes.Create, newOne);
+  };
+  removeOne = event => {
+    const newData = this.state.data.filter(e => e.id !== event.id);
+    this.setState({ data: newData });
+    this.triggerCbs(EventPerformTypes.Remove, event);
+  };
+  setEditing = e => {
+    this.setState({
+      editing: e
+    });
+  };
+
+  isEditingEvent = e => {
+    return this.state.editing && this.state.editing.id == e.id;
+  };
+  cleanEditing = () => {
+    this.setState({
+      editing: null
+    });
+    this._rendered = false;
+  };
+
+  _rendered;
+  renderEditForm = (args = {}) => {
+    if (this._rendered) {
+      return;
     }
-    this.state.data.push(newOne)
-    this.setState({data: this.state.data})
-  }
+    args.removeOne = this.removeOne
+    args.handleClose = this.cleanEditing
+    args.changeEvent = this.changeEvent
+
+    const rendered = this._performProps("renderForm", {
+      ...args,
+      handleClose: this.cleanEditing
+    });
+    if (rendered && React.isValidElement(rendered)) {
+
+      this._rendered = rendered;
+    } else {
+      console.error(`Please check the prop [renderForm], make sure it will return a Component`)
+    }
+    return rendered;
+  };
 }
+
 const eventSource = new EventSource();
 const datesourceShared = new DateSource();
 

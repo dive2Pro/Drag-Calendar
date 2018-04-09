@@ -100,12 +100,22 @@
 
   1. ~~取消 event data 中的 index 属性, 改为 渲染前计算~~. 不修改 event 中的 data, 而是在 Week 中复制 data, 计算后赋值 index, 在本周中的 Day 都以改 index 为值来计算
 
-- [ ] 处理空白位置 响应 mouse 事件
+- [x] 处理空白位置 响应 mouse 事件
   - [x] double click
   - [x] 划拉一段, 生成一个事件, 以 这段为起止时间
-  - [ ] edit 接口
         
 - [ ] style
     [ ] 修改 drag 时 preview  
-    [ ] 修改样式
+    [x] 修改样式
     [ ] 使用 popmotion 添加动画
+
+- [ ] edit 接口
+    1. 点击 event 时, 渲染 edit form
+    2. editform 应该在点击位置打开 -- 计算位置
+    3. editform 可以拿到 function(修改当前 event 的 data)
+    4.  修改后, 应该可以通过 props 告知
+      - update
+      - delete
+      - create
+    5. editform 修改完成 | 关闭时, 通知 Calendar
+    

@@ -51,7 +51,6 @@ const dropCollect = (connect, monitor) => {
   dropCollect
 )
 export class Day extends React.PureComponent {
-
   componentDidUpdate(prevProps) {
     if (!prevProps.isOver && this.props.isOver) {
       const { monitor, draggingType } = this.props;
@@ -84,11 +83,11 @@ export class Day extends React.PureComponent {
     }
   }
   _handleCreate = () => {
-    const { time } = this.props
+    const { time } = this.props;
     eventSource.createNewOne({
       startTime: time,
       endTime: time
-    })
+    });
   };
   render() {
     const {
@@ -122,7 +121,15 @@ export class Day extends React.PureComponent {
       for (let i = 0; i <= maxIndex; i++) {
         const found = sortedEvents.find(e => e.index == i);
         if (found) {
-          events[i] = <Event key={found.id + " - "} e={found} time={time} />;
+          events[i] = (
+            <React.Fragment key={found.id + " - "}>
+              <Event e={found} time={time} />
+              <div className="_edit_form">
+                {eventSource.isEditingEvent(found) &&
+                  eventSource.renderEditForm()}
+              </div>
+            </React.Fragment>
+          );
         } else {
           events[i] = (
             <EmptyPart
@@ -138,10 +145,10 @@ export class Day extends React.PureComponent {
     return connectDropTarget(
       <div
         className={
-          (isCurrentMonth ? '_current_month ' : ' ')
-          +  "__calendar_day " 
-          + className 
-          + hasActive(activeRange, time)
+          (isCurrentMonth ? "_current_month " : " ") +
+          "__calendar_day " +
+          className +
+          hasActive(activeRange, time)
         }
       >
         <div>{getDayOfMonth(time)}</div>

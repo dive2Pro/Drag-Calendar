@@ -49,13 +49,18 @@ function collect(connect, monitor) {
 export class Event extends React.PureComponent {
   componentDidMount() {}
 
-  _handleClick = () => {
+  _handleClick = (event) => {
     const { e, time, onEventEdit } = this.props;
-    logGroup(" event clicked ");
+    eventSource.setEditing(e)
     if (onEventEdit) {
-      onEventEdit(e, time);
+      // onEventEdit(event, e, time);
     }
   };
+
+  _handleClose = () => {
+    
+  }
+
   render() {
     const { e, time, isDragging, connectDragSource } = this.props;
     const canTrailStretch = hasTrail(e, time) === " ";
@@ -81,7 +86,6 @@ export class Event extends React.PureComponent {
           }}
         >
           {showContent(e, time)}
-          - - {e.index}
         </div>
         {canTrailStretch && <StretchPart e={e} direction="right" time={time} />}
       </div>
