@@ -19,7 +19,9 @@ class RenderForm extends React.PureComponent {
   state = {
     startValue: moment(this.props.e.startTime),
     endValue: moment(this.props.e.endTime),
-    content: null
+    content: null,
+    startOpen: false,
+    endOpen: false
   };
 
   disabledStartDate = startValue => {
@@ -38,9 +40,14 @@ class RenderForm extends React.PureComponent {
     return endValue.valueOf() <= startValue.valueOf();
   };
   onChange = (field, value) => {
+    const {changeEvent, e} = this.props
     this.setState({
       [field]: value
+    }, () => {
+      const {startValue, endValue} = this.state
+      changeEvent({...e, startTime: startValue, endTime: endValue})
     });
+
   };
 
   onStartChange = value => {
@@ -50,11 +57,31 @@ class RenderForm extends React.PureComponent {
   onEndChange = value => {
     this.onChange("endValue", value);
   };
-  
+  handleStartOpenChange = (open) => {
+    if (open) {
+      this.setState({
+        endOpen: false
+      })
+    }
+    this.setState({
+      startOpen: open
+    })
+  }
+
+  handleEndOpenChange = (open) => {
+    if (open) {
+      this.setState({
+        startOpen: false
+      })
+    }
+    this.setState({
+      endOpen: open
+    })
+  }
   render() {
     const { args } = this.props;
     const { removeOne, e, handleClose, changeEvent } = this.props;
-    const { startValue, endValue, endOpen } = this.state;
+    const { startValue, endValue, endOpen, startOpen } = this.state;
     const suffix = !!e.content ? <Icon type="close-circle" onClick={() => changeEvent({...e,
        content: ''})} /> : null 
     return (
@@ -83,8 +110,10 @@ class RenderForm extends React.PureComponent {
               showTime
               format="YYYY-MM-DD HH:mm:ss"
               value={startValue}
+              open={startOpen}
               placeholder="Start"
               onChange={this.onStartChange}
+              onOpenChange={this.handleStartOpenChange}
             />
           </div>
           <div>
@@ -140,7 +169,6 @@ class Calender extends React.PureComponent {
             <Days />
           </div>
         </section>
-        {/* <CustomDragLayer /> */}
       </UnStatedProvider>
     );
   }

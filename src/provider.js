@@ -355,10 +355,8 @@ class EventSource extends Container {
     this.setState({
       editing: null
     });
-    this._rendered = false;
   };
 
-  _rendered;
 
   renderEditForm = (args = {}) => {
     args.removeOne = this.removeOne;
@@ -375,7 +373,6 @@ class EventSource extends Container {
     if (!args.e) {
       console.error(`args.e doesn't exits`, this.state);
     } else if (rendered && React.isValidElement(rendered)) {
-      this._rendered = rendered;
     } else {
       console.error(
         `Please check the prop [renderForm], make sure it will return a Component`

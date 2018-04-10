@@ -11,6 +11,7 @@ const EventDragSource = {
   beginDrag(props) {
     const { e, time } = props;
     eventSource.generateTempOne(e);
+    eventSource.cleanEditing()
     return {
       id: e.id,
       time,
@@ -119,11 +120,11 @@ export class Event extends React.PureComponent {
               <StretchPart e={e} direction="left" time={time} />
             )}
             <div
-              className={"event-content"}
+              className={`event-content ${isDragging ? 'is-dragging' : ''}`}
               style={{
                 backgroundColor: `hsla(${e.index * 30 + 50}, 100%, 50%, 1)`,
                 opacity: isDragging ? 0.5 : 1,
-                cursor: "move"
+                cursor:  isDragging ? "none" : "move"
               }}
             >
               {showContent(e, time)}
