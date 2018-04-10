@@ -9,6 +9,8 @@ import { DatePicker, Popover, Button, Input, Icon } from "antd";
 import moment from "moment";
 import "antd/dist/antd.css";
 import "./styles.scss";
+import CustomDragLayer from './components/CustomDragLayer'
+
 import { logGroup, getDayOfWeek, log } from "./util";
 
 console.clear();
@@ -138,6 +140,7 @@ class Calender extends React.PureComponent {
             <Days />
           </div>
         </section>
+        <CustomDragLayer />
       </UnStatedProvider>
     );
   }
@@ -146,17 +149,17 @@ class Calender extends React.PureComponent {
 render(
   <Calender
     onEventCreated={(...args) => {
-      log(args)
+      // log(args)
     }}
     onEventUpdated={(...args) => {
-      log(args)
+      // log(args)
     }}
     onEventRemoved={(...args) => {
-      log(args)
+      // log(args)
     }}
     renderForm={(...args) => {
       const e = args[0];
-      logGroup("23", typeof e);
+      // logGroup("23", typeof e);
       return <RenderForm {...e} />;
     }}
     showDate={"2018/4/1"}

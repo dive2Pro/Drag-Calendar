@@ -109,7 +109,7 @@
     [x] 修改样式
     [ ] 使用 popmotion 添加动画
 
-- [ ] edit 接口
+- [x] edit 接口
     1. 点击 event 时, 渲染 edit form
     2. editform 应该在点击位置打开 -- 计算位置
     3. editform 可以拿到 function(修改当前 event 的 data)

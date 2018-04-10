@@ -1,17 +1,17 @@
 Arguments: 
-  /home/hyc/.nvm/versions/node/v8.10.0/bin/node /usr/share/yarn/bin/yarn.js add lodash.cloneDeep
+  /Users/hyc/.nvm/versions/node/v8.9.0/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js
 
 PATH: 
-  /home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/.bin:/home/hyc/.config/yarn/link/node_modules/.bin:/home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/.bin:/home/hyc/.config/yarn/link/node_modules/.bin:/home/hyc/.yarn/bin:/home/hyc/.nvm/versions/node/v8.10.0/libexec/lib/node_modules/npm/bin/node-gyp-bin:/home/hyc/.nvm/versions/node/v8.10.0/lib/node_modules/npm/bin/node-gyp-bin:/home/hyc/.nvm/versions/node/v8.10.0/bin/node_modules/npm/bin/node-gyp-bin:/home/hyc/.nvm/versions/node/v8.10.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin
+  /Users/hyc/.rvm/gems/ruby-2.2.3/bin:/Users/hyc/.rvm/gems/ruby-2.2.3@global/bin:/Users/hyc/.rvm/rubies/ruby-2.2.3/bin:/Users/hyc/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/hyc/.rvm/gems/ruby-2.2.3/bin:/Users/hyc/.rvm/gems/ruby-2.2.3@global/bin:/Users/hyc/.rvm/rubies/ruby-2.2.3/bin:/Users/hyc/.nvm/versions/node/v8.9.0/bin:/Users/hyc/.cargo/bin:/Users/hyc/.rvm/bin
 
 Yarn version: 
   1.5.1
 
 Node version: 
-  8.10.0
+  8.9.0
 
 Platform: 
-  linux x64
+  darwin x64
 
 npm manifest: 
   {
@@ -5389,11 +5389,4 @@ Lockfile:
       yargs-parser "^5.0.0"
 
 Trace: 
-  Error: Couldn't find package "lodash.cloneDeep" on the "npm" registry.
-      at new MessageError (/usr/share/yarn/lib/cli.js:186:110)
-      at NpmResolver.<anonymous> (/usr/share/yarn/lib/cli.js:51625:15)
-      at Generator.next (<anonymous>)
-      at step (/usr/share/yarn/lib/cli.js:98:30)
-      at /usr/share/yarn/lib/cli.js:109:13
-      at <anonymous>
-      at process._tickCallback (internal/process/next_tick.js:188:7)
+  Error: EACCES: permission denied, unlink '/Users/hyc/Desktop/demos/Drag-Calendar/node_modules/.bin/acorn'

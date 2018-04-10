@@ -25,7 +25,7 @@ const eventItemTarget = {
       const delta = dropTime - item.time;
       // delta 应用到 event 的 startTime 和 endTime
       logGroup("drop end ", delta);
-
+      // eventSource.removeTempOne();
       eventSource.changeEventDate(item, delta);
     } else if (draggingType === ItemTypes.EMPTY) {
     }
