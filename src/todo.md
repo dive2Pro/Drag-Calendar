@@ -105,7 +105,23 @@
   - [x] 划拉一段, 生成一个事件, 以 这段为起止时间
         
 - [ ] style
-    [ ] 修改 drag 时 preview  
+    [x] 修改 drag 时 preview  
+        修改时发现, 在 html5 中是没有办法去 动态修改 ghost object ( 如果 是用 js 修改 cssText, 也就是setDragImage 中的第一个 参数). 
+        ```javascript
+          const div = document.createElement("div");
+          div.style.opacity = 0
+          div.style.height = '100px'
+          div.style.width = '100px'
+          div.style.background = 'blue'
+          div.innerHTML = "This is div"
+          connectDragPreview(<div className="_drag_preview"> This is a div </div>);
+        ```
+        ~~但是我们可以修改之前setup 前的 ghost object 的样式, 通过 external css~~  通过 `DragLayer`修改
+        ```
+          const dragPreview = document.createElement('div')
+          dragPreview.id = 'drag-preview'
+          document.body.appendChild(dragPreview);
+        ```
     [x] 修改样式
     [ ] 使用 popmotion 添加动画
 

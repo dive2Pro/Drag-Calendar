@@ -48,6 +48,10 @@ function collect(connect, monitor) {
   };
 }
 
+const dragPreview = document.createElement("div");
+dragPreview.id = "drag-preview";
+document.body.appendChild(dragPreview);
+
 @DragSource(ItemTypes.EVENT, EventDragSource, collect)
 export class Event extends React.PureComponent {
   state = {};
@@ -55,20 +59,20 @@ export class Event extends React.PureComponent {
     const { connectDragPreview } = this.props;
     if (connectDragPreview) {
       const div = document.createElement("div");
-      div.style.opacity = 0
-      div.style.height = '100px'
-      div.style.width = '100px'
-      div.style.background = 'blue'
-      div.innerHTML = "This is div"
-      connectDragPreview(<div className="_drag_preview"> This is a div </div>);
+      div.style.opacity = 0;
+      div.style.height = "100px";
+      div.style.width = "100px";
+      div.style.background = "blue";
+      div.innerHTML = "This is div";
+      connectDragPreview(dragPreview);
+      // connectDragPreview(<div className="_drag_preview"> This is a div </div>);
       const img = new Image();
       img.style.opacity = 0;
-      img.style.display = 'none'
+      // img.style.display = 'none'
+      img.className = "drag-preview-img";
       img.src =
         "https://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg";
       img.onload = () => {
-        // connectDragPreview(img);
-        // console.log(img);
       };
     }
   }

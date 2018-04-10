@@ -140,7 +140,7 @@ class Calender extends React.PureComponent {
             <Days />
           </div>
         </section>
-        <CustomDragLayer />
+        {/* <CustomDragLayer /> */}
       </UnStatedProvider>
     );
   }
