@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import { DragSource } from "react-dnd";
 import { ItemTypes } from "../constants";
 import { eventSource, dateSourceShared } from "../provider";
+import { getDragPreview } from "../util";
 const spec = {
   beginDrag(props) {
     const { time } = props;
@@ -27,12 +28,16 @@ const spec = {
 const collect = (connect, monitor) => {
   return {
     connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging()
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview()
   };
 };
 
 @DragSource(ItemTypes.EMPTY, spec, collect)
 export class EmptyPart extends PureComponent {
+  componentDidMount() {
+    this.props.connectDragPreview(getDragPreview())
+  }
   render() {
     const { isDragging, connectDragSource, onCreate } = this.props;
     return connectDragSource(

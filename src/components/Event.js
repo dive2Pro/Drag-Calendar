@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import { DragSource } from "react-dnd";
-import { hasHead, hasTrail, logGroup, showContent } from "../util";
+import { hasHead, hasTrail, logGroup, showContent, getDragPreview } from "../util";
 import { ItemTypes, rows, EventEnum } from "../constants";
 import { eventSource, dateSourceShared } from "../provider";
 import { StretchPart } from "./StretchPart";
@@ -53,9 +53,6 @@ function collect(connect, monitor) {
   };
 }
 
-const dragPreview = document.createElement("div");
-dragPreview.id = "drag-preview";
-document.body.appendChild(dragPreview);
 
 @DragSource(ItemTypes.EVENT, EventDragSource, collect)
 export class Event extends React.PureComponent {
@@ -63,7 +60,7 @@ export class Event extends React.PureComponent {
   componentDidMount() {
     const { connectDragPreview } = this.props;
     if (connectDragPreview) {
-       connectDragPreview(dragPreview);
+       connectDragPreview(getDragPreview());
     }
   }
 

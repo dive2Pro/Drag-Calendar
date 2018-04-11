@@ -134,3 +134,12 @@ export const setTimeBeDayStart = (time) => {
   helperDate.setSeconds(0)
   return helperDate.setMinutes(0)
 }
+
+
+const dragPreview = document.createElement("div");
+dragPreview.id = "drag-preview";
+document.body.appendChild(dragPreview);
+
+export const getDragPreview = () => {
+  return dragPreview
+}

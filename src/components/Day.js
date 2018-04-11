@@ -147,9 +147,6 @@ export class Day extends React.PureComponent {
         }
       }
     }
-    if (time === new Date("2018-4-5").getTime()) {
-      logGroup(" --- ", activeRange, time, hasActive(activeRange, time));
-    }
     return connectDropTarget(
       <div
         className={

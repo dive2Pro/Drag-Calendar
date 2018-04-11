@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import { DragSource } from 'react-dnd'
 import {ItemTypes} from '../constants'
 import { eventSource, dateSourceShared } from '../provider'
+import { getDragPreview } from '../util';
 
 const spec = {
   beginDrag(props, monitor) {
@@ -23,7 +24,8 @@ const spec = {
 const collect = (connect, monitor) => {
   return {
     connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging()
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview()
   }
 }
 /**
@@ -37,6 +39,10 @@ const collect = (connect, monitor) => {
  */
 @DragSource(ItemTypes.STRETCH, spec, collect )
 export class StretchPart extends PureComponent {
+
+  componentDidMount() {
+    this.props.connectDragPreview(getDragPreview())
+  }
 
   render () {
     const {direction, connectDragSource, isDragging } = this.props
