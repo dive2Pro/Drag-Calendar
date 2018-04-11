@@ -3,7 +3,7 @@ import React, { PureComponent } from "react";
 import { Container } from "unstated";
 import { EventEnum, DefaultActiveRange } from "./constants";
 
-import { geneNewId, logGroup, helperDate } from "./util";
+import { geneNewId, logGroup, helperDate, randomColor, log } from "./util";
 const cloneDeep = require("lodash.clonedeep");
 
 const _processState = newState => {
@@ -173,6 +173,8 @@ class EventSource extends Container {
         }
       ]
     };
+
+    this.state.data = this.state.data.map( d => ({...d, color: randomColor()}))
   }
 
   _temp = null;
@@ -323,7 +325,8 @@ class EventSource extends Container {
     const newOne = {
       id: geneNewId(),
       ...obj,
-      type: EventEnum.new
+      type: EventEnum.new,
+      color: randomColor()
     };
     this.state.data.push(newOne);
     this.setState({ data: this.state.data });

@@ -122,7 +122,7 @@ export class Event extends React.PureComponent {
             <div
               className={`event-content ${isDragging ? 'is-dragging' : ''}`}
               style={{
-                backgroundColor: `hsla(${e.index * 30 + 50}, 100%, 50%, 1)`,
+                backgroundColor: e.color,
                 opacity: isDragging ? 0.5 : 1,
                 cursor:  isDragging ? "none" : "move"
               }}

@@ -1,6 +1,6 @@
 export const EventEnum = {
-  data: "B_data",
   hover: "A_hover",
+  data: "B_data",
   temp: "C_temp",
   new: "D_new"
 };

@@ -1,5 +1,5 @@
 Arguments: 
-  /Users/hyc/.nvm/versions/node/v8.9.0/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js
+  /Users/hyc/.nvm/versions/node/v8.9.0/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js add lodash.random
 
 PATH: 
   /Users/hyc/.rvm/gems/ruby-2.2.3/bin:/Users/hyc/.rvm/gems/ruby-2.2.3@global/bin:/Users/hyc/.rvm/rubies/ruby-2.2.3/bin:/Users/hyc/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/hyc/.rvm/gems/ruby-2.2.3/bin:/Users/hyc/.rvm/gems/ruby-2.2.3@global/bin:/Users/hyc/.rvm/rubies/ruby-2.2.3/bin:/Users/hyc/.nvm/versions/node/v8.9.0/bin:/Users/hyc/.cargo/bin:/Users/hyc/.rvm/bin
