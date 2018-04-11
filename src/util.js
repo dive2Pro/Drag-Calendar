@@ -101,7 +101,6 @@ export const hasTrail = (event, time) => {
  */
 export const hasActive = (activeRange, time) => {
   if (Array.isArray(activeRange)) {
-    logGroup(" hasActive ", activeRange, time);
     if (time <= activeRange[1] && time >= activeRange[0]) {
       // debugger
       return " _active ";
@@ -121,7 +120,7 @@ export const showContent = (e, time) => {
   return null;
 };
 
-const COLORS = ["#ff9a9e", "#a18cd1", "#a1c4fd", "#d4fc79"];
+const COLORS = [280, 78, 166, 44];
 
 export const randomColor = () => {
   return COLORS[random(0, COLORS.length - 1)];

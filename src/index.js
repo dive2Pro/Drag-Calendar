@@ -9,7 +9,7 @@ import { DatePicker, Popover, Button, Input, Icon } from "antd";
 import moment from "moment";
 import "antd/dist/antd.css";
 import "./styles.scss";
-import CustomDragLayer from './components/CustomDragLayer'
+import CustomDragLayer from "./components/CustomDragLayer";
 
 import { logGroup, getDayOfWeek, log } from "./util";
 
@@ -40,14 +40,16 @@ class RenderForm extends React.PureComponent {
     return endValue.valueOf() <= startValue.valueOf();
   };
   onChange = (field, value) => {
-    const {changeEvent, e} = this.props
-    this.setState({
-      [field]: value
-    }, () => {
-      const {startValue, endValue} = this.state
-      changeEvent({...e, startTime: startValue, endTime: endValue})
-    });
-
+    const { changeEvent, e } = this.props;
+    this.setState(
+      {
+        [field]: value
+      },
+      () => {
+        const { startValue, endValue } = this.state;
+        changeEvent({ ...e, startTime: startValue, endTime: endValue });
+      }
+    );
   };
 
   onStartChange = value => {
@@ -57,49 +59,56 @@ class RenderForm extends React.PureComponent {
   onEndChange = value => {
     this.onChange("endValue", value);
   };
-  handleStartOpenChange = (open) => {
+  handleStartOpenChange = open => {
     if (open) {
       this.setState({
         endOpen: false
-      })
+      });
     }
     this.setState({
       startOpen: open
-    })
-  }
+    });
+  };
 
-  handleEndOpenChange = (open) => {
+  handleEndOpenChange = open => {
     if (open) {
       this.setState({
         startOpen: false
-      })
+      });
     }
     this.setState({
       endOpen: open
-    })
-  }
+    });
+  };
   render() {
     const { args } = this.props;
     const { removeOne, e, handleClose, changeEvent } = this.props;
     const { startValue, endValue, endOpen, startOpen } = this.state;
-    const suffix = !!e.content ? <Icon type="close-circle" onClick={() => changeEvent({...e,
-       content: ''})} /> : null 
+    const suffix = !!e.content ? (
+      <Icon
+        type="close-circle"
+        onClick={() =>
+          changeEvent({
+            ...e,
+            content: ""
+          })
+        }
+      />
+    ) : null;
     return (
       <React.Fragment>
         <div className="render-form-title">Title</div>
         <div className="render-form-content">
           <div>
-            <span>
-            Content:
-            </span>
+            <span>Content:</span>
             <Input
-            style={{width:'auto'}}
-            placeholder={"Change Event Content"}
-            ref={n => this.contentInput = n}
-            value={e.content}
-            onChange={ev => {
-                changeEvent({...e, content: ev.target.value})
-            }}
+              style={{ width: "auto" }}
+              placeholder={"Change Event Content"}
+              ref={n => (this.contentInput = n)}
+              value={e.content}
+              onChange={ev => {
+                changeEvent({ ...e, content: ev.target.value });
+              }}
               suffix={suffix}
             />
           </div>
@@ -176,6 +185,7 @@ class Calender extends React.PureComponent {
 
 render(
   <Calender
+    newOneContent="新建事件"
     onEventCreated={(...args) => {
       // log(args)
     }}

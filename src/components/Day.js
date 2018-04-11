@@ -67,8 +67,6 @@ export class Day extends React.PureComponent {
         // logGroup(" Stretch ", item);
 
         const { time: itemTime, direction } = item;
-        const { x, y } = monitor.getDifferenceFromInitialOffset();
-
         let delta = dayTime - itemTime;
 
         if (direction === "right") {

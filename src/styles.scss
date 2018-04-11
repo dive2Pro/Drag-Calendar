@@ -4,6 +4,7 @@ $minheight: 100px;
 $rightpadding: 10px;
 // $secondColor: 
 $thirdColor: #9d9d9d;
+
 @mixin XxY($x, $y) {
   grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
 }
@@ -96,7 +97,10 @@ $thirdColor: #9d9d9d;
       padding-right: $rightpadding;
     }
     &._active {
-      background: red;
+      background: #d0f0ff;
+      & ._stretch {
+        background: inherit;
+      }
     }
   }
 }

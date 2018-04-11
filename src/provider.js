@@ -284,7 +284,7 @@ class EventSource extends Container {
     }
   }
   changeEventStartTime(item, delta) {
-    if (item.startTime + delta < item.endTime) {
+    if (item.startTime + delta <= item.endTime) {
       let targetEvent;
       const newData = this.state.data.map(e => {
         if (e.id == item.id) {
@@ -326,7 +326,8 @@ class EventSource extends Container {
       id: geneNewId(),
       ...obj,
       type: EventEnum.new,
-      color: randomColor()
+      color: randomColor(),
+      content: this._props.newOneContent
     };
     this.state.data.push(newOne);
     this.setState({ data: this.state.data });
