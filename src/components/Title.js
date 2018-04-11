@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 
 import { Subscribe } from "unstated";
-import { datesourceShared } from "../provider";
+import { dateSourceShared } from "../provider";
 
 export class Title extends React.PureComponent {
   constructor(props) {
@@ -16,7 +16,7 @@ export class Title extends React.PureComponent {
     const { className = "", currentMonth, currentYear } = this.props;
 
     return (
-      <Subscribe to={[datesourceShared]}>
+      <Subscribe to={[dateSourceShared]}>
         {({ state: { currentMonth, currentYear }, change }) => {
           return (
             <div className={"_calendar_title " + className}>

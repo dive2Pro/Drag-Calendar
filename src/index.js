@@ -3,7 +3,7 @@ import { render } from "react-dom";
 import { Provider as UnStatedProvider } from "unstated";
 import { DragDropContext } from "react-dnd";
 import HTML5Backend from "react-dnd-html5-backend";
-import { datesourceShared, eventSource } from "./provider";
+import { dateSourceShared, eventSource } from "./provider";
 import { Headers, Title, Days } from "./components";
 import { DatePicker, Popover, Button, Input, Icon } from "antd";
 import moment from "moment";
@@ -165,7 +165,7 @@ class RenderForm extends React.PureComponent {
 class Calender extends React.PureComponent {
   constructor(props) {
     super(props);
-    datesourceShared.init(props);
+    dateSourceShared.init(props);
     eventSource.init(props);
   }
   render() {

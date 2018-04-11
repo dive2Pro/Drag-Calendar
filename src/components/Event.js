@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import { DragSource } from "react-dnd";
 import { hasHead, hasTrail, logGroup, showContent } from "../util";
 import { ItemTypes, rows, EventEnum } from "../constants";
-import { eventSource } from "../provider";
+import { eventSource, dateSourceShared } from "../provider";
 import { StretchPart } from "./StretchPart";
 import Tooltip from "rc-tooltip";
 import "rc-tooltip/assets/bootstrap.css";
@@ -10,8 +10,11 @@ import "rc-tooltip/assets/bootstrap.css";
 const EventDragSource = {
   beginDrag(props) {
     const { e, time } = props;
+
     eventSource.generateTempOne(e);
     eventSource.cleanEditing()
+    dateSourceShared.setActiveRange(e.startTime, e.endTime)
+
     return {
       id: e.id,
       time,
@@ -27,8 +30,9 @@ const EventDragSource = {
       // or if the drag ended but nobody handled the drop
       // return;
     }
-
+    dateSourceShared.resetActiveRange()
     eventSource.removeTempOne();
+    eventSource.removeActiveEvent();
     eventSource.changeEventState(e, EventEnum.data);
   },
   isDragging(props, monitor) {
@@ -59,31 +63,13 @@ export class Event extends React.PureComponent {
   componentDidMount() {
     const { connectDragPreview } = this.props;
     if (connectDragPreview) {
-      const div = document.createElement("div");
-      div.style.opacity = 0;
-      div.style.height = "100px";
-      div.style.width = "100px";
-      div.style.background = "blue";
-      div.innerHTML = "This is div";
-      connectDragPreview(dragPreview);
-      // connectDragPreview(<div className="_drag_preview"> This is a div </div>);
-      const img = new Image();
-      img.style.opacity = 0;
-      // img.style.display = 'none'
-      img.className = "drag-preview-img";
-      img.src =
-        "https://www.jqueryscript.net/images/Simplest-Responsive-jQuery-Image-Lightbox-Plugin-simple-lightbox.jpg";
-      img.onload = () => {
-      };
+       connectDragPreview(dragPreview);
     }
   }
 
   _handleClick = event => {
     const { e, time, onEventEdit } = this.props;
     eventSource.setEditing(e.id, time);
-    if (onEventEdit) {
-      // onEventEdit(event, e, time);
-    }
   };
   _domRef = n => {
     this.setState({

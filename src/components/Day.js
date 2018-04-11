@@ -1,8 +1,15 @@
 import React, { PureComponent } from "react";
 import { DropTarget } from "react-dnd";
-import { logGroup, log, plusDays, getDayOfMonth, hasActive } from "../util";
+import {
+  logGroup,
+  log,
+  plusDays,
+  getDayOfMonth,
+  hasActive,
+  setTimeBeDayStart
+} from "../util";
 import { Event } from "./Event";
-import { eventSource, datesourceShared } from "../provider";
+import { eventSource, dateSourceShared } from "../provider";
 import { sortEvent } from "../sortEvent";
 import { ItemTypes, EventEnum } from "../constants";
 import { EmptyPart } from "./EmptyPart";
@@ -24,7 +31,6 @@ const eventItemTarget = {
       // 比较 time 和 drop time  = delta
       const delta = dropTime - item.time;
       // delta 应用到 event 的 startTime 和 endTime
-      logGroup("drop end ", delta);
       // eventSource.removeTempOne();
       eventSource.changeEventDate(item, delta);
     } else if (draggingType === ItemTypes.EMPTY) {
@@ -63,6 +69,8 @@ export class Day extends React.PureComponent {
         const delta = dayTime - item.time;
         // delta 应用到 event 的 startTime 和 endTime
         eventSource.changeEventDate(item, delta);
+        const newItem = eventSource.state.data.find(e => e.id === item.id);
+        dateSourceShared.setActiveRange(newItem.startTime, newItem.endTime);
       } else if (draggingType === ItemTypes.STRETCH) {
         // logGroup(" Stretch ", item);
 
@@ -74,12 +82,16 @@ export class Day extends React.PureComponent {
         } else {
           eventSource.changeEventStartTime(item, delta);
         }
+
+        const newItem = eventSource.state.data.find(e => e.id === item.id);
+        dateSourceShared.setActiveRange(newItem.startTime, newItem.endTime);
       } else {
         // empty
-        datesourceShared.setActiveRange(item.time, dayTime);
+        dateSourceShared.setActiveRange(item.time, dayTime);
       }
     }
   }
+
   _handleCreate = () => {
     const { time } = this.props;
     eventSource.createNewOne({
@@ -135,7 +147,9 @@ export class Day extends React.PureComponent {
         }
       }
     }
-
+    if (time === new Date("2018-4-5").getTime()) {
+      logGroup(" --- ", activeRange, time, hasActive(activeRange, time));
+    }
     return connectDropTarget(
       <div
         className={

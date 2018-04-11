@@ -3,7 +3,7 @@ import React, { PureComponent } from "react";
 import { Container } from "unstated";
 import { EventEnum, DefaultActiveRange } from "./constants";
 
-import { geneNewId, logGroup, helperDate, randomColor, log } from "./util";
+import { geneNewId, logGroup, helperDate, randomColor, log, setTimeBeDayStart } from "./util";
 const cloneDeep = require("lodash.clonedeep");
 
 const _processState = newState => {
@@ -50,8 +50,9 @@ class DateSource extends Container {
       [time2, time1] = [time1, time2];
     }
     // logGroup(" set active Range", time1, time2)
+
     this.setState({
-      activeRange: [time1, time2]
+      activeRange: [ setTimeBeDayStart(time1), time2]
     });
   };
 
@@ -385,9 +386,21 @@ class EventSource extends Container {
 
     return rendered;
   };
+
+  setActiveEvent = (id) => {
+    this.setState({
+      activeId: id
+    })
+  }
+
+  removeActiveEvent = () => {
+    this.setState({
+      activeId: null
+    })
+  }
 }
 
 const eventSource = new EventSource();
-const datesourceShared = new DateSource();
+const dateSourceShared = new DateSource();
 
-export { datesourceShared, DateSource, eventSource, EventSource };
+export { dateSourceShared, DateSource, eventSource, EventSource };

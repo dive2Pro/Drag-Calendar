@@ -1,7 +1,7 @@
 import React, { PureComponent , Children } from 'react'
 
 import { Subscribe } from "unstated";
-import { datesourceShared, eventSource } from "../provider";
+import { dateSourceShared, eventSource } from "../provider";
 import { Day } from './Day'
 import { rows , columns } from '../constants'
 import { plusDays, minusDays, log, logGroup} from '../util'
@@ -43,7 +43,7 @@ class Week extends React.PureComponent {
 export class Days extends React.PureComponent {
   render() {
     return (
-      <Subscribe to={[datesourceShared]}>
+      <Subscribe to={[dateSourceShared]}>
         {dateSource => {
           const days = [];
           const { dayoffset, day1Time, activeRange } = dateSource.state;

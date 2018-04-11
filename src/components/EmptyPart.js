@@ -1,7 +1,7 @@
 import React, { PureComponent } from "react";
 import { DragSource } from "react-dnd";
 import { ItemTypes } from "../constants";
-import { eventSource, datesourceShared } from "../provider";
+import { eventSource, dateSourceShared } from "../provider";
 const spec = {
   beginDrag(props) {
     const { time } = props;
@@ -12,7 +12,7 @@ const spec = {
   },
 
   endDrag(props, monitor) {
-    const activeRange = datesourceShared.getActiveRange();
+    const activeRange = dateSourceShared.getActiveRange();
     if (activeRange) {
       const newEvent = {
         startTime: activeRange[0],
@@ -20,7 +20,7 @@ const spec = {
       };
       eventSource.createNewOne(newEvent);
     }
-    datesourceShared.resetActiveRange();
+    dateSourceShared.resetActiveRange();
   }
 };
 

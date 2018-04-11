@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import { DragSource } from 'react-dnd'
 import {ItemTypes} from '../constants'
-
+import { eventSource, dateSourceShared } from '../provider'
 
 const spec = {
   beginDrag(props, monitor) {
@@ -14,6 +14,9 @@ const spec = {
       time
     }
     return item
+  },
+  endDrag(props) {
+    dateSourceShared.resetActiveRange();
   }
 }
 

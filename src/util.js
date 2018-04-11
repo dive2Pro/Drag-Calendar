@@ -69,7 +69,7 @@ export const eventSort = (events = []) => {
   // 2. 各个 group 再 sort
   let arrays = [];
   Object.keys(types)
-    .sort((a,b) => a.localeCompare(b))
+    .sort((a, b) => a.localeCompare(b))
     .forEach(key => {
       // 3.合并
       arrays = arrays.concat(types[key].sort(sortByStartTimeOrLastTime));
@@ -85,7 +85,6 @@ export const hasHead = (event, time) => {
 export const hasTrail = (event, time) => {
   const _4_1 = helperDate.setMonth(3, 1);
   if (_4_1 === time) {
-    // debugger
   }
   const hastrail = event.endTime >= time + plusDays(1);
 
@@ -102,9 +101,11 @@ export const hasTrail = (event, time) => {
 export const hasActive = (activeRange, time) => {
   if (Array.isArray(activeRange)) {
     if (time <= activeRange[1] && time >= activeRange[0]) {
-      // debugger
       return " _active ";
     }
+  // } else if (Object.prototype.isPrototypeOf(activeRange)) {
+  } else if (activeRange === time) {
+    return  " _active "
   }
   return " ";
 };
@@ -125,3 +126,11 @@ const COLORS = [280, 78, 166, 44];
 export const randomColor = () => {
   return COLORS[random(0, COLORS.length - 1)];
 };
+
+
+export const setTimeBeDayStart = (time) => {
+  helperDate.setTime(time)
+  helperDate.setHours(0)
+  helperDate.setSeconds(0)
+  return helperDate.setMinutes(0)
+}

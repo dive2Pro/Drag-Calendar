@@ -1,6 +1,6 @@
 import React from "react";
 import { Subscribe } from "unstated";
-import { datesourceShared } from "../provider";
+import { dateSourceShared } from "../provider";
 import { columns } from "../constants";
 
 const WeekNames = ["日", "一","二","三","四","五","六"]
@@ -16,7 +16,7 @@ export class Header extends React.PureComponent {
 export class Headers extends React.PureComponent {
   render() {
     return (
-      <Subscribe to={[datesourceShared]}>
+      <Subscribe to={[dateSourceShared]}>
         {() => {
           const headers = [];
           new Array(columns).fill(0).forEach((_, i) => {
