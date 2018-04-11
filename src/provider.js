@@ -206,7 +206,6 @@ class EventSource extends Container {
     this._temp = cloneDeep({
       ...e,
       id: e.id + "_temp",
-      content: "TEMP@",
       type: EventEnum.temp
     });
     this.state.data.push(this._temp);

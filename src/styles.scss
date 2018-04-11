@@ -127,6 +127,7 @@ $thirdColor: #9d9d9d;
   width: inherit;
   display: inherit;
   position: relative;
+  cursor: move;
   &.hashead {
     width: calc(100% + 1px);
     left: -1px;
@@ -150,7 +151,9 @@ $thirdColor: #9d9d9d;
       border-bottom-right-radius: 0px;
     }
   }
-
+  &.C_temp {
+    opacity: 0.5;
+  }
   & .left-drag {
     min-width: 15px;
 

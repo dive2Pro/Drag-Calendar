@@ -107,8 +107,6 @@ export class Event extends React.PureComponent {
               style={{
                 backgroundColor: `hsl(${e.color}, 78%, 91%)`,
                 color: `hsl(${e.color}, 90%, 33%)`,
-                opacity: isDragging ? 0.5 : 1,
-                cursor:  isDragging ? "none" : "move"
               }}
             >
               {showContent(e, time)}
