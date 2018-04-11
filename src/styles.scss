@@ -57,6 +57,10 @@ $thirdColor: #9d9d9d;
       span[role="img"] {
         font-size: 1.4em;
       }
+      & button {
+        background: none;
+        border: none;
+      }
     }
   }
   .__headers {
