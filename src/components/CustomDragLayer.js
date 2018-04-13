@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import { DragLayer } from "react-dnd";
 
@@ -37,7 +37,7 @@ function getItemStyles(props) {
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging()
 }))
-export default class CustomDragLayer extends Component {
+export default class CustomDragLayer extends PureComponent {
   static propTypes = {
     item: PropTypes.object,
     itemType: PropTypes.string,

@@ -77,8 +77,8 @@ export class Event extends React.PureComponent {
     const { e, time, isDragging, connectDragSource } = this.props;
     const canTrailStretch = hasTrail(e, time) === " ";
     const canHeadStretch = hasHead(e, time) === " ";
-
     const isTooltipVisible = eventSource.isEditingEvent(e, time);
+    
     return (
       <Tooltip
         visible={isTooltipVisible}

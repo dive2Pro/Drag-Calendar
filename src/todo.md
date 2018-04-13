@@ -104,7 +104,7 @@
   - [x] double click
   - [x] 划拉一段, 生成一个事件, 以 这段为起止时间
         
-- [ ] style
+- [x] style
     [x] 修改 drag 时 preview  
         修改时发现, 在 html5 中是没有办法去 动态修改 ghost object ( 如果 是用 js 修改 cssText, 也就是setDragImage 中的第一个 参数). 
         ```javascript
@@ -123,7 +123,6 @@
           document.body.appendChild(dragPreview);
         ```
     [x] 修改样式
-    [ ] 使用 popmotion 添加动画
 
 - [x] edit 接口
     1. 点击 event 时, 渲染 edit form
@@ -134,4 +133,5 @@
       - delete
       - create
     5. editform 修改完成 | 关闭时, 通知 Calendar
-    
+
+[ ] 使用 popmotion 添加动画
