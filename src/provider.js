@@ -45,25 +45,6 @@ class DateSource extends Container {
     this.setState(newState);
   };
 
-  setActiveRange = (time1, time2) => {
-    if (parseInt(time1) > parseInt(time2)) {
-      [time2, time1] = [time1, time2];
-    }
-    // logGroup(" set active Range", time1, time2)
-
-    this.setState({
-      activeRange: [ setTimeBeDayStart(time1), time2]
-    });
-  };
-
-  resetActiveRange = () => {
-    this.setState({
-      activeRange: DefaultActiveRange
-    });
-  };
-  getActiveRange = () => {
-    return this.state.activeRange;
-  };
   isCurrentMonth = time => {
     const { currentYear, currentMonth } = this.state;
     helperDate.setFullYear(currentYear);
@@ -307,6 +288,28 @@ class EventSource extends Container {
       activeId: null
     })
   }
+
+  setActiveRange = (time1, time2) => {
+    if (parseInt(time1) > parseInt(time2)) {
+      [time2, time1] = [time1, time2];
+    }
+    // logGroup(" set active Range", time1, time2)
+
+    this.setState({
+      activeRange: [ setTimeBeDayStart(time1), time2]
+    });
+  };
+
+  resetActiveRange = () => {
+    this.setState({
+      activeRange: DefaultActiveRange
+    });
+  };
+
+  getActiveRange = () => {
+    return this.state.activeRange;
+  };
+  
 }
 
 const eventSource = new EventSource();

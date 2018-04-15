@@ -13,8 +13,8 @@ const EventDragSource = {
 
     eventSource.generateTempOne(e);
     eventSource.cleanEditing()
-    dateSourceShared.setActiveRange(e.startTime, e.endTime)
-
+    eventSource.setActiveRange(e.startTime, e.endTime)
+    
     return {
       id: e.id,
       time,
@@ -30,7 +30,7 @@ const EventDragSource = {
       // or if the drag ended but nobody handled the drop
       // return;
     }
-    dateSourceShared.resetActiveRange()
+    eventSource.resetActiveRange()
     eventSource.removeTempOne();
     eventSource.removeActiveEvent();
     eventSource.changeEventState(e, EventEnum.data);

@@ -63,14 +63,11 @@ export class Day extends React.PureComponent {
       const item = monitor.getItem();
       const { time: dayTime } = this.props;
       if (draggingType === ItemTypes.EVENT) {
-        // drag item { id, time}
-        // logGroup(" item did up ", item);
-        // 比较 time 和 drop time  = delta
         const delta = dayTime - item.time;
         // delta 应用到 event 的 startTime 和 endTime
         eventSource.changeEventDate(item, delta);
         const newItem = eventSource.state.data.find(e => e.id === item.id);
-        dateSourceShared.setActiveRange(newItem.startTime, newItem.endTime);
+        eventSource.setActiveRange(newItem.startTime, newItem.endTime);
       } else if (draggingType === ItemTypes.STRETCH) {
         // logGroup(" Stretch ", item);
 
@@ -84,10 +81,10 @@ export class Day extends React.PureComponent {
         }
 
         const newItem = eventSource.state.data.find(e => e.id === item.id);
-        dateSourceShared.setActiveRange(newItem.startTime, newItem.endTime);
+        eventSource.setActiveRange(newItem.startTime, newItem.endTime);
       } else {
         // empty
-        dateSourceShared.setActiveRange(item.time, dayTime);
+       eventSource.setActiveRange(item.time, dayTime);
       }
     }
   }
@@ -103,7 +100,7 @@ export class Day extends React.PureComponent {
     const {
       className = "",
       time,
-      data,
+      events,
       changeIndex,
       connectDropTarget,
       isOver,
@@ -111,19 +108,15 @@ export class Day extends React.PureComponent {
       activeRange,
       isCurrentMonth
     } = this.props;
-
-    if (typeof data.filter !== "function") {
-      log(this.props);
-    }
-
-    const filtedEvent = data.filter(d => {
+    // 拿到在这一天的事件
+    const filtedEvent = events.filter(d => {
       const { startTime, endTime } = d;
       return (
         (time >= startTime || startTime - time < plusDays(1)) && time <= endTime
       );
     });
 
-    let events = [];
+    let eventViews= [];
     if (filtedEvent.length) {
       let emptykey = 0;
       const sortedEvents = sortEvent(changeIndex, filtedEvent, time);
@@ -131,13 +124,13 @@ export class Day extends React.PureComponent {
       for (let i = 0; i <= maxIndex; i++) {
         const found = sortedEvents.find(e => e.index == i);
         if (found) {
-          events[i] = (
+          eventViews[i] = (
             <React.Fragment key={found.id + " - "}>
               <Event e={found} time={time} />
             </React.Fragment>
           );
         } else {
-          events[i] = (
+          eventViews[i] = (
             <EmptyPart
               key={i + "_empty " + time}
               time={time}
@@ -157,7 +150,7 @@ export class Day extends React.PureComponent {
         }
       >
         <div>{getDayOfMonth(time)}</div>
-        <div className={`__item_events`}>{events}</div>
+        <div className={`__item_events`}>{eventViews}</div>
         <EmptyPart time={time} onCreate={this._handleCreate} />
       </div>
     );

@@ -17,7 +17,7 @@ const spec = {
     return item
   },
   endDrag(props) {
-    dateSourceShared.resetActiveRange();
+    eventSource.resetActiveRange();
   }
 }
 

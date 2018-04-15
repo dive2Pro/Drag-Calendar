@@ -13,7 +13,7 @@ const spec = {
   },
 
   endDrag(props, monitor) {
-    const activeRange = dateSourceShared.getActiveRange();
+    const activeRange = eventSource.getActiveRange();
     if (activeRange) {
       const newEvent = {
         startTime: activeRange[0],
@@ -21,7 +21,7 @@ const spec = {
       };
       eventSource.createNewOne(newEvent);
     }
-    dateSourceShared.resetActiveRange();
+    eventSource.resetActiveRange();
   }
 };
 
