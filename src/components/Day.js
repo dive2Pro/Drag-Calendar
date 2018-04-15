@@ -13,6 +13,7 @@ import { eventSource, dateSourceShared } from "../provider";
 import { sortEvent } from "../sortEvent";
 import { ItemTypes, EventEnum } from "../constants";
 import { EmptyPart } from "./EmptyPart";
+var shallowEqual = require("fbjs/lib/shallowEqual");
 
 const eventItemTarget = {
   drop(props, monitor, component) {
@@ -56,7 +57,34 @@ const dropCollect = (connect, monitor) => {
   eventItemTarget,
   dropCollect
 )
-export class Day extends React.PureComponent {
+export class Day extends React.Component {
+  static getDerivedStateFromProps(nextProps, prevState) {
+    // 拿到 isActive 放入 state
+    const { events, time, className, activeRange } = nextProps;
+    
+    // 拿到 filtedEvent 放入 state
+    const filtedEvent = events.filter(d => {
+      const { startTime, endTime } = d;
+      return (
+        (time >= startTime || startTime - time < plusDays(1)) && time <= endTime
+      );
+    });
+    const newState = {
+      events: filtedEvent,
+      className: className + hasActive(activeRange, time)
+    };
+    // console.log(" --- derived state from props");
+
+    return newState;
+  }
+  state = {};
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { activeRange: nextActiveRange, events: nevents, className: nc, ...nextRestProps } = nextProps;
+    const { activeRange: thisActiveRange, events, className: tc, ...thisRestProps } = this.props;
+
+    return !shallowEqual(nextState, this.state) || !shallowEqual(thisRestProps, nextRestProps);
+  }
   componentDidUpdate(prevProps) {
     if (!prevProps.isOver && this.props.isOver) {
       const { monitor, draggingType } = this.props;
@@ -84,7 +112,7 @@ export class Day extends React.PureComponent {
         eventSource.setActiveRange(newItem.startTime, newItem.endTime);
       } else {
         // empty
-       eventSource.setActiveRange(item.time, dayTime);
+        eventSource.setActiveRange(item.time, dayTime);
       }
     }
   }
@@ -98,28 +126,18 @@ export class Day extends React.PureComponent {
   };
   render() {
     const {
-      className = "",
       time,
-      events,
       changeIndex,
       connectDropTarget,
-      isOver,
-      canDrop,
-      activeRange,
       isCurrentMonth
     } = this.props;
     // 拿到在这一天的事件
-    const filtedEvent = events.filter(d => {
-      const { startTime, endTime } = d;
-      return (
-        (time >= startTime || startTime - time < plusDays(1)) && time <= endTime
-      );
-    });
 
-    let eventViews= [];
-    if (filtedEvent.length) {
+    const {className, events} = this.state
+    let eventViews = [];
+    if (events.length) {
       let emptykey = 0;
-      const sortedEvents = sortEvent(changeIndex, filtedEvent, time);
+      const sortedEvents = sortEvent(changeIndex, events, time);
       const maxIndex = sortedEvents[sortedEvents.length - 1].index;
       for (let i = 0; i <= maxIndex; i++) {
         const found = sortedEvents.find(e => e.index == i);
@@ -145,8 +163,7 @@ export class Day extends React.PureComponent {
         className={
           (isCurrentMonth ? "_current_month " : " ") +
           "__calendar_day " +
-          className +
-          hasActive(activeRange, time)
+          className
         }
       >
         <div>{getDayOfMonth(time)}</div>

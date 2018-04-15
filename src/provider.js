@@ -3,8 +3,16 @@ import React, { PureComponent } from "react";
 import { Container } from "unstated";
 import { EventEnum, DefaultActiveRange } from "./constants";
 
-import { geneNewId, logGroup, helperDate, randomColor, log, setTimeBeDayStart } from "./util";
+import {
+  geneNewId,
+  logGroup,
+  helperDate,
+  randomColor,
+  log,
+  setTimeBeDayStart
+} from "./util";
 const cloneDeep = require("lodash.clonedeep");
+const throttle = require("lodash.throttle");
 
 const _processState = newState => {
   const Day1 = new Date(
@@ -65,14 +73,15 @@ const EventPerformTypes = {
 class EventSource extends Container {
   constructor() {
     super();
-    this.state = { };
+    this.state = {};
+    this.setActiveRange = throttle(this.setActiveRange, 250)
   }
 
   _temp = null;
 
-  init = (props) => {
+  init = props => {
     this._props = props;
-    this.state = { data: props.initialEventSource || []}
+    this.state = { data: props.initialEventSource || [] };
   };
   /**
    *
@@ -252,7 +261,6 @@ class EventSource extends Container {
     });
   };
 
-
   renderEditForm = (args = {}) => {
     args.removeOne = this.removeOne;
     args.handleClose = this.cleanEditing;
@@ -277,17 +285,17 @@ class EventSource extends Container {
     return rendered;
   };
 
-  setActiveEvent = (id) => {
+  setActiveEvent = id => {
     this.setState({
       activeId: id
-    })
-  }
+    });
+  };
 
   removeActiveEvent = () => {
     this.setState({
       activeId: null
-    })
-  }
+    });
+  };
 
   setActiveRange = (time1, time2) => {
     if (parseInt(time1) > parseInt(time2)) {
@@ -296,7 +304,7 @@ class EventSource extends Container {
     // logGroup(" set active Range", time1, time2)
 
     this.setState({
-      activeRange: [ setTimeBeDayStart(time1), time2]
+      activeRange: [setTimeBeDayStart(time1), time2]
     });
   };
 
@@ -309,7 +317,6 @@ class EventSource extends Container {
   getActiveRange = () => {
     return this.state.activeRange;
   };
-  
 }
 
 const eventSource = new EventSource();
