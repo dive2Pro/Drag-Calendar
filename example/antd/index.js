@@ -4,7 +4,7 @@ import { DatePicker, Popover, Button, Input, Icon } from "antd";
 import moment from "moment";
 import "antd/dist/antd.css";
 import { render } from "react-dom";
-import {DragCalender, randomColor} from '../../dist/bundle.js'
+import {DragCalendar, randomColor} from '../../dist/bundle.js'
 import "../../dist/styles.css"
 import { data } from './data'
 class RenderForm extends React.PureComponent {
@@ -156,7 +156,7 @@ class RenderForm extends React.PureComponent {
 
 
 render(
-  <DragCalender
+  <DragCalendar
     initialEventSource={data.map(d => ({...d, color: randomColor()}))}
     newOneContent="新建事件"
     onEventCreated={(...args) => {
