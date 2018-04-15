@@ -1,21 +1,20 @@
 import React from "react";
-import { render } from "react-dom";
 import { Provider as UnStatedProvider } from "unstated";
-import { DragDropContext } from "react-dnd";
-import HTML5Backend from "react-dnd-html5-backend";
-import { datesourceShared, eventSource } from "./provider";
+import createHTML5Backend from "react-dnd-html5-backend";
+import { dateSourceShared, eventSource } from "./provider";
 import { Headers, Title, Days } from "./components";
 import "./styles.scss";
-import { logGroup } from "./util";
+import CustomDragLayer from "./components/CustomDragLayer";
 
-console.clear();
-
-@DragDropContext(HTML5Backend)
-class Calender extends React.PureComponent {
+import { logGroup, getDayOfWeek, log, randomColor } from "./util";
+// import { DragDropContext } from "react-dnd";
+const DragDropContext = require('react-dnd').DragDropContext
+@DragDropContext(createHTML5Backend)
+export class DragCalendar extends React.PureComponent {
   constructor(props) {
-    super(props)
-    datesourceShared.init(props);
-    eventSource.init(props)
+    super(props);
+    dateSourceShared.init(props);
+    eventSource.init(props);
   }
   render() {
     return (
@@ -32,9 +31,6 @@ class Calender extends React.PureComponent {
   }
 }
 
-render(<Calender
-  renderForm={(...args) => {
-    logGroup(args)
-    return <div>Hello</div>
-  }}
-  showDate={"2018/4/1"} />, document.getElementById("root"));
+export default DragCalendar
+
+export { randomColor }

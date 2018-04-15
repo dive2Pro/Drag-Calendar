@@ -1,6 +1,6 @@
 export const EventEnum = {
-  data: "B_data",
   hover: "A_hover",
+  data: "B_data",
   temp: "C_temp",
   new: "D_new"
 };
@@ -16,3 +16,4 @@ export const rows = 6;
 
 
 export const DefaultActiveRange = null
+export const WeekNames = ["日", "一","二","三","四","五","六"]

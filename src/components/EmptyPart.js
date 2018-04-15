@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
 import { DragSource } from "react-dnd";
 import { ItemTypes } from "../constants";
-import { eventSource, datesourceShared } from "../provider";
+import { eventSource, dateSourceShared } from "../provider";
+import { getDragPreview } from "../util";
 const spec = {
   beginDrag(props) {
     const { time } = props;
@@ -12,7 +13,7 @@ const spec = {
   },
 
   endDrag(props, monitor) {
-    const activeRange = datesourceShared.getActiveRange();
+    const activeRange = eventSource.getActiveRange();
     if (activeRange) {
       const newEvent = {
         startTime: activeRange[0],
@@ -20,19 +21,23 @@ const spec = {
       };
       eventSource.createNewOne(newEvent);
     }
-    datesourceShared.resetActiveRange();
+    eventSource.resetActiveRange();
   }
 };
 
 const collect = (connect, monitor) => {
   return {
     connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging()
+    isDragging: monitor.isDragging(),
+    connectDragPreview: connect.dragPreview()
   };
 };
 
 @DragSource(ItemTypes.EMPTY, spec, collect)
 export class EmptyPart extends PureComponent {
+  componentDidMount() {
+    this.props.connectDragPreview(getDragPreview())
+  }
   render() {
     const { isDragging, connectDragSource, onCreate } = this.props;
     return connectDragSource(

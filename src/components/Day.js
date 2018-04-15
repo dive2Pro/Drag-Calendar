@@ -1,11 +1,19 @@
 import React, { PureComponent } from "react";
 import { DropTarget } from "react-dnd";
-import { logGroup, log, plusDays, getDayOfMonth, hasActive } from "../util";
+import {
+  logGroup,
+  log,
+  plusDays,
+  getDayOfMonth,
+  hasActive,
+  setTimeBeDayStart
+} from "../util";
 import { Event } from "./Event";
-import { eventSource, datesourceShared } from "../provider";
+import { eventSource, dateSourceShared } from "../provider";
 import { sortEvent } from "../sortEvent";
 import { ItemTypes, EventEnum } from "../constants";
 import { EmptyPart } from "./EmptyPart";
+var shallowEqual = require("fbjs/lib/shallowEqual");
 
 const eventItemTarget = {
   drop(props, monitor, component) {
@@ -24,8 +32,7 @@ const eventItemTarget = {
       // 比较 time 和 drop time  = delta
       const delta = dropTime - item.time;
       // delta 应用到 event 的 startTime 和 endTime
-      logGroup("drop end ", delta);
-
+      // eventSource.removeTempOne();
       eventSource.changeEventDate(item, delta);
     } else if (draggingType === ItemTypes.EMPTY) {
     }
@@ -50,25 +57,49 @@ const dropCollect = (connect, monitor) => {
   eventItemTarget,
   dropCollect
 )
-export class Day extends React.PureComponent {
+export class Day extends React.Component {
+  static getDerivedStateFromProps(nextProps, prevState) {
+    // 拿到 isActive 放入 state
+    const { events, time, className, activeRange } = nextProps;
+    
+    // 拿到 filtedEvent 放入 state
+    const filtedEvent = events.filter(d => {
+      const { startTime, endTime } = d;
+      return (
+        (time >= startTime || startTime - time < plusDays(1)) && time <= endTime
+      );
+    });
+    const newState = {
+      events: filtedEvent,
+      className: className + hasActive(activeRange, time)
+    };
+    // console.log(" --- derived state from props");
+
+    return newState;
+  }
+  state = {};
+
+  shouldComponentUpdate(nextProps, nextState) {
+    const { activeRange: nextActiveRange, events: nevents, className: nc, ...nextRestProps } = nextProps;
+    const { activeRange: thisActiveRange, events, className: tc, ...thisRestProps } = this.props;
+
+    return !shallowEqual(nextState, this.state) || !shallowEqual(thisRestProps, nextRestProps);
+  }
   componentDidUpdate(prevProps) {
     if (!prevProps.isOver && this.props.isOver) {
       const { monitor, draggingType } = this.props;
       const item = monitor.getItem();
       const { time: dayTime } = this.props;
       if (draggingType === ItemTypes.EVENT) {
-        // drag item { id, time}
-        // logGroup(" item did up ", item);
-        // 比较 time 和 drop time  = delta
         const delta = dayTime - item.time;
         // delta 应用到 event 的 startTime 和 endTime
         eventSource.changeEventDate(item, delta);
+        const newItem = eventSource.state.data.find(e => e.id === item.id);
+        eventSource.setActiveRange(newItem.startTime, newItem.endTime);
       } else if (draggingType === ItemTypes.STRETCH) {
         // logGroup(" Stretch ", item);
 
         const { time: itemTime, direction } = item;
-        const { x, y } = monitor.getDifferenceFromInitialOffset();
-
         let delta = dayTime - itemTime;
 
         if (direction === "right") {
@@ -76,12 +107,16 @@ export class Day extends React.PureComponent {
         } else {
           eventSource.changeEventStartTime(item, delta);
         }
+
+        const newItem = eventSource.state.data.find(e => e.id === item.id);
+        eventSource.setActiveRange(newItem.startTime, newItem.endTime);
       } else {
         // empty
-        datesourceShared.setActiveRange(item.time, dayTime);
+        eventSource.setActiveRange(item.time, dayTime);
       }
     }
   }
+
   _handleCreate = () => {
     const { time } = this.props;
     eventSource.createNewOne({
@@ -91,47 +126,29 @@ export class Day extends React.PureComponent {
   };
   render() {
     const {
-      className = "",
       time,
-      data,
       changeIndex,
       connectDropTarget,
-      isOver,
-      canDrop,
-      activeRange,
       isCurrentMonth
     } = this.props;
+    // 拿到在这一天的事件
 
-    if (typeof data.filter !== "function") {
-      log(this.props);
-    }
-
-    const filtedEvent = data.filter(d => {
-      const { startTime, endTime } = d;
-      return (
-        (time >= startTime || startTime - time < plusDays(1)) && time <= endTime
-      );
-    });
-
-    let events = [];
-    if (filtedEvent.length) {
+    const {className, events} = this.state
+    let eventViews = [];
+    if (events.length) {
       let emptykey = 0;
-      const sortedEvents = sortEvent(changeIndex, filtedEvent, time);
+      const sortedEvents = sortEvent(changeIndex, events, time);
       const maxIndex = sortedEvents[sortedEvents.length - 1].index;
       for (let i = 0; i <= maxIndex; i++) {
         const found = sortedEvents.find(e => e.index == i);
         if (found) {
-          events[i] = (
+          eventViews[i] = (
             <React.Fragment key={found.id + " - "}>
               <Event e={found} time={time} />
-              <div className="_edit_form">
-                {eventSource.isEditingEvent(found) &&
-                  eventSource.renderEditForm()}
-              </div>
             </React.Fragment>
           );
         } else {
-          events[i] = (
+          eventViews[i] = (
             <EmptyPart
               key={i + "_empty " + time}
               time={time}
@@ -141,18 +158,16 @@ export class Day extends React.PureComponent {
         }
       }
     }
-
     return connectDropTarget(
       <div
         className={
           (isCurrentMonth ? "_current_month " : " ") +
           "__calendar_day " +
-          className +
-          hasActive(activeRange, time)
+          className
         }
       >
         <div>{getDayOfMonth(time)}</div>
-        <div className={`__item_events`}>{events}</div>
+        <div className={`__item_events`}>{eventViews}</div>
         <EmptyPart time={time} onCreate={this._handleCreate} />
       </div>
     );

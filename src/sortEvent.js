@@ -7,6 +7,7 @@ import {
   sortByIndex,
   sortByStartTime,
   sortByStartTimeOrLastTime,
+  eventSort
 } from "./util";
 
 /**
@@ -38,19 +39,15 @@ export const sortEvent = (changeIndex, events, time) => {
     }
   });
 
-  twoStar = twoStar.sort(sortByStartTime);
-  threeStar = threeStar.sort(sortByStartTimeOrLastTime);
-  const allStar = fiveStar
-    .concat(fourStar)
-    .concat(threeStar)
-    .concat(twoStar);
+  twoStar = eventSort(twoStar)
+  threeStar =eventSort(threeStar)
 
   fiveStar.concat(fourStar).forEach(e => {
     let index = 0;
     if (getDayOfWeek(time) === 0) {
       // 在每周日, 检查 fiveStar 和 fourStar 的 index
       // fiveStar 根据 起止 时间排序
-      fiveStar = fiveStar.sort(sortByStartTimeOrLastTime);
+      fiveStar = eventSort(fiveStar)
 
       fiveStar.forEach((e, i) => {
         changeIndex(e, i);
@@ -58,7 +55,7 @@ export const sortEvent = (changeIndex, events, time) => {
       const fiveStarLastIndex = fiveStar.length
         ? fiveStar[fiveStar.length - 1].index
         : -1;
-      fourStar = fourStar.sort(sortByStartTimeOrLastTime);
+      fourStar = eventSort(fourStar)
 
       fourStar.forEach((e, i) => {
         changeIndex(e, fiveStarLastIndex + 1 + i);
@@ -75,8 +72,7 @@ export const sortEvent = (changeIndex, events, time) => {
   // 如果 index 和 高星有冲突
   // 变成  [1, 3, 4]
   const highStar = fiveStar.concat(fourStar).sort(sortByIndex);
-  threeStar = threeStar.sort(sortByStartTimeOrLastTime);
-  twoStar = twoStar.sort(sortByStartTimeOrLastTime);
+
   let lowStar = threeStar.concat(twoStar);
 
   lowStar.forEach(e => {

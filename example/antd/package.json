@@ -1,0 +1,15 @@
+{
+  "name": "antd",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "antd": "^3.4.1",
+    "parcel-bundler": "^1.7.0",
+    "react": "^16.3.1",
+    "react-dom": "^16.3.1"
+  },
+  "scripts": {
+    "start": "parcel index.html --open"
+  }
+}

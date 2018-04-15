@@ -1,4 +1,6 @@
+import { EventEnum } from "./constants";
 const uniqid = require("uniqid");
+const random = require("lodash.random");
 
 export const logGroup = (title, ...args) => {
   console.group(title);
@@ -49,15 +51,40 @@ export const sortByStartTimeOrLastTime = (a, b) => {
   }
 };
 
+/**
+ *
+ * 根据 type 和 startTime & endTime 排序
+ *
+ * @param {{type: string, startTime: number, endTime: number}[]} events
+ * @return {{type: string, startTime: number, endTime: number}[]} sortedEvents
+ */
+export const eventSort = (events = []) => {
+  // 1. 根据 type 分 group
+  const types = {};
+  events.forEach(event => {
+    types[event.type] = types[event.type] || [];
+    types[event.type].push(event);
+  });
+
+  // 2. 各个 group 再 sort
+  let arrays = [];
+  Object.keys(types)
+    .sort((a, b) => a.localeCompare(b))
+    .forEach(key => {
+      // 3.合并
+      arrays = arrays.concat(types[key].sort(sortByStartTimeOrLastTime));
+    });
+  return arrays;
+};
+
 export const hasHead = (event, time) => {
   const hashead = event.startTime < time;
   return hashead ? " hashead " : " ";
 };
 
 export const hasTrail = (event, time) => {
-  const _4_1 = helperDate.setMonth(3, 1)
+  const _4_1 = helperDate.setMonth(3, 1);
   if (_4_1 === time) {
-    // debugger
   }
   const hastrail = event.endTime >= time + plusDays(1);
 
@@ -73,11 +100,12 @@ export const hasTrail = (event, time) => {
  */
 export const hasActive = (activeRange, time) => {
   if (Array.isArray(activeRange)) {
-    logGroup(" hasActive ", activeRange, time);
     if (time <= activeRange[1] && time >= activeRange[0]) {
-      // debugger
       return " _active ";
     }
+  // } else if (Object.prototype.isPrototypeOf(activeRange)) {
+  } else if (activeRange === time) {
+    return  " _active "
   }
   return " ";
 };
@@ -87,8 +115,31 @@ export const geneNewId = (...args) => {
 };
 
 export const showContent = (e, time) => {
-  if (hasHead(e, time) == ' ' || getDayOfWeek(time) === 0  ) {
+  if (hasHead(e, time) == " " || getDayOfWeek(time) === 0) {
     return e.content;
   }
   return null;
 };
+
+const COLORS = [280, 78, 166, 44];
+
+export const randomColor = () => {
+  return COLORS[random(0, COLORS.length - 1)];
+};
+
+
+export const setTimeBeDayStart = (time) => {
+  helperDate.setTime(time)
+  helperDate.setHours(0)
+  helperDate.setSeconds(0)
+  return helperDate.setMinutes(0)
+}
+
+
+const dragPreview = document.createElement("div");
+dragPreview.id = "drag-preview";
+document.body.appendChild(dragPreview);
+
+export const getDragPreview = () => {
+  return dragPreview
+}
