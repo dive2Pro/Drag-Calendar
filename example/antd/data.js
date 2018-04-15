@@ -1,3 +1,9 @@
+export const EventEnum = {
+  hover: "A_hover",
+  data: "B_data",
+  temp: "C_temp",
+  new: "D_new"
+};
 export const data  = [
   {
     id: 0,
