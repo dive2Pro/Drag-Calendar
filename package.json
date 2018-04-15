@@ -8,15 +8,18 @@
     "build": "parcel build index.html",
     "build:lib": "rollup -c"
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "antd": "^3.4.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.random": "^3.2.0",
     "rc-tooltip": "^3.7.0",
-    "react": "16.3.1",
+    "react": "^16.3.1",
     "react-dnd": "^2.6.0",
     "react-dnd-html5-backend": "^2.6.0",
-    "react-dom": "16.3.1",
+    "react-dom": "^16.3.1",
     "unstated": "^2.0.1"
   },
   "devDependencies": {
@@ -29,11 +32,13 @@
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "node-sass": "^4.8.3",
-    "parcel-bundler": "^1.6.1",
+    "parcel-bundler": "^1.7.0",
+    "postcss-modules": "^1.1.0",
     "rollup": "^0.57.1",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-postcss": "^1.5.1",
     "rollup-plugin-scss": "^0.4.0"
   },
   "keywords": []

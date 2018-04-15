@@ -7,7 +7,7 @@ import { Headers, Title, Days } from "./components";
 import "./styles.scss";
 import CustomDragLayer from "./components/CustomDragLayer";
 
-import { logGroup, getDayOfWeek, log } from "./util";
+import { logGroup, getDayOfWeek, log, randomColor } from "./util";
 // import { DragDropContext } from "react-dnd";
 const DragDropContext = require('react-dnd').DragDropContext
 
@@ -34,3 +34,4 @@ export class DragCalender extends React.PureComponent {
 }
 
 export default DragCalender
+export { randomColor }

@@ -16,3 +16,4 @@ export const rows = 6;
 
 
 export const DefaultActiveRange = null
+export const WeekNames = ["日", "一","二","三","四","五","六"]

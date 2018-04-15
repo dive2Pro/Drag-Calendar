@@ -2,13 +2,15 @@ import resolve from 'rollup-plugin-node-resolve';
 import babel from 'rollup-plugin-babel'
 import scss from 'rollup-plugin-scss'
 import commonjs from 'rollup-plugin-commonjs';
-
+import postcss from 'rollup-plugin-postcss'
+import postcssModules from 'postcss-modules'
+const cssExportMap = {}
 export default {
   input: 'src/index.js',
   output: {
-    file: 'bundle.js',
+    file: 'dist/bundle.js',
     format: 'cjs',
-    paths: 'dist'
+    name: 'lib'
   },
   plugins: [
     resolve({
@@ -16,7 +18,22 @@ export default {
     }),
     scss(),
     babel({
-      exclude: 'node_modules/**'
+      exclude: 'node_modules/**',
+      plugins: ['external-helpers']
+    }),
+    postcss({
+      // plugins: [
+      //   // postcssModules({
+      //   //   getJSON(id, exportToken) {
+      //   //     cssExportMap[id] = exportToken
+      //   //   }
+      //   // })
+      // ],
+      // getExportNamed: false,
+      // getExport(id) {
+      //   return cssExportMap[id]
+      // },
+      extract: 'dist/styles.css'
     }),
     commonjs({
       namedExports: {

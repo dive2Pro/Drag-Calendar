@@ -1,9 +1,8 @@
 import React from "react";
 import { Subscribe } from "unstated";
 import { dateSourceShared } from "../provider";
-import { columns } from "../constants";
+import { columns, WeekNames } from "../constants";
 
-const WeekNames = ["日", "一","二","三","四","五","六"]
 export class Header extends React.PureComponent {
   render() {
     const { className = "", index } = this.props;
