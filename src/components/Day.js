@@ -97,7 +97,6 @@ export class Day extends React.Component {
         const newItem = eventSource.state.data.find(e => e.id === item.id);
         eventSource.setActiveRange(newItem.startTime, newItem.endTime);
       } else if (draggingType === ItemTypes.STRETCH) {
-        // logGroup(" Stretch ", item);
 
         const { time: itemTime, direction } = item;
         let delta = dayTime - itemTime;
