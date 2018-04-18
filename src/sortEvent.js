@@ -62,7 +62,6 @@ export const sortEvent = (changeIndex, events, time) => {
       });
     }
   });
-  // logGroup('fourStar', fourStar)
 
   // 事件的起点在 这个 time 内
   // 不关联 4星和5星的排序

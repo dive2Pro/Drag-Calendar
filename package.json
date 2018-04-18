@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.html",
   "scripts": {
-    "start": "parcel index.html --open",
+    "start:demo": "parcel index.html --open",
     "build": "parcel build index.html",
     "build:lib": "rollup -c"
   },
@@ -14,7 +14,6 @@
     "types/*.d.ts"
   ],
   "dependencies": {
-    "antd": "^3.4.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.random": "^3.2.0",
     "lodash.throttle": "^4.1.1",
@@ -27,6 +26,7 @@
     "unstated": "1.2.0"
   },
   "devDependencies": {
+    "antd": "^3.4.1",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
