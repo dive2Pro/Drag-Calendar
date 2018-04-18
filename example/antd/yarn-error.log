@@ -1,5 +1,5 @@
 Arguments: 
-  /home/hyc/.nvm/versions/node/v8.10.0/bin/node /usr/share/yarn/bin/yarn.js
+  /home/hyc/.nvm/versions/node/v8.10.0/bin/node /usr/share/yarn/bin/yarn.js start
 
 PATH: 
   /home/hyc/.nvm/versions/node/v8.10.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin
@@ -4540,4 +4540,17 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.1.tgz#a5c6d532be656e23db820efb943a1f04998d63af"
 
 Trace: 
-  Error: ENOENT: no such file or directory, copyfile '/home/hyc/.cache/yarn/v1/npm-kind-of-5.1.0-729c91e2d857b7a419a1f9aa65685c4c33f5845d/LICENSE' -> '/home/hyc/Desktop/source-repos/Drag-Calendar/example/antd/node_modules/define-property/node_modules/kind-of/LICENSE'
+  Error: Command failed.
+  Exit code: 1
+  Command: sh
+  Arguments: -c parcel index.html --open
+  Directory: /home/hyc/Desktop/source-repos/Drag-Calendar/example/antd
+  Output:
+  
+      at ProcessTermError.MessageError (/usr/share/yarn/lib/cli.js:186:110)
+      at new ProcessTermError (/usr/share/yarn/lib/cli.js:226:113)
+      at ChildProcess.<anonymous> (/usr/share/yarn/lib/cli.js:30281:17)
+      at emitTwo (events.js:126:13)
+      at ChildProcess.emit (events.js:214:7)
+      at maybeClose (internal/child_process.js:925:16)
+      at Process.ChildProcess._handle.onexit (internal/child_process.js:209:5)

@@ -5,25 +5,37 @@ import { dateSourceShared, eventSource } from "../provider";
 import { Day } from "./Day";
 import { rows, columns } from "../constants";
 import { plusDays, minusDays, log, logGroup } from "../util";
+import posed, { PoseGroup } from 'react-pose'
 const cloneDeep = require("lodash.clonedeep");
 
 class Week extends React.PureComponent {
   _emptys = [];
+  static getDeviredStateFromProps(nextProps, prevState) {
+    console.log('----', nextProps);
+    
+    return {}
+  }
   constructor(props) {
     super(props);
   }
+
   __weekRef = n => {
     this._weekDiv = n;
+    const {hostRef} = this.props
+    if(hostRef){
+      hostRef(n)
+    }
   };
   _changeIndex = (e, index) => {
     e.index = index;
   };
 
+  
   render() {
     const self = this;
     const { timeRange } = this.props;
-    const startTime = timeRange.shift();
-    const endTime = timeRange.pop();
+    const startTime = [...timeRange].shift();
+    const endTime = [...timeRange].pop() + plusDays(1);
 
     return (
       <div className="__week" ref={this.__weekRef}>
@@ -60,6 +72,16 @@ class Week extends React.PureComponent {
   }
 }
 
+
+const AnimationWeek = posed(Week)({
+  enter: { opacity: 1,
+    //  left: '0%' 
+    },
+  exit: { opacity: 0 , 
+    // left: '20%'
+   }
+})
+
 export class Days extends React.PureComponent {
   render() {
     return (
@@ -80,7 +102,7 @@ export class Days extends React.PureComponent {
                 timeRange.push(time);
                 week.push(
                   <Day
-                    key={"prev - " + i + " - " + c}
+                    key={time}
                     time={time}
                     isCurrentMonth={dateSource.isCurrentMonth(time)}
                   />
@@ -91,7 +113,7 @@ export class Days extends React.PureComponent {
                 timeRange.push(time);
                 week.push(
                   <Day
-                    key={i + " now " + c}
+                    key={time}
                     time={time}
                     isCurrentMonth={dateSource.isCurrentMonth(time)}
                   />
@@ -100,15 +122,16 @@ export class Days extends React.PureComponent {
             }
 
             weeks.push(
-              <Week
-                timeRange={timeRange}
-                key={i + " week- "}
+              <AnimationWeek
+                timeRange={timeRange }
+                key={timeRange[0] + '-' +i }
               >
                 {week}
-              </Week>
+              </AnimationWeek>
             );
           }
-          return <React.Fragment> {weeks} </React.Fragment>;
+          // 注意 这里 {weeks} 和' > ' '</' 符号之间的空格或其他非 Component的child  
+          return <PoseGroup>{weeks}</PoseGroup>;
         }}
       </Subscribe>
     );

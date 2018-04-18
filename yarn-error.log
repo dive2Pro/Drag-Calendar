@@ -1,5 +1,5 @@
 Arguments: 
-  /home/hyc/.nvm/versions/node/v8.10.0/bin/node /usr/share/yarn/bin/yarn.js build:lib
+  /home/hyc/.nvm/versions/node/v8.10.0/bin/node /usr/share/yarn/bin/yarn.js
 
 PATH: 
   /home/hyc/.nvm/versions/node/v8.10.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin
@@ -20,7 +20,7 @@ npm manifest:
     "description": "",
     "main": "index.html",
     "scripts": {
-      "start": "parcel index.html --open",
+      "start:demo": "parcel index.html --open",
       "build": "parcel build index.html",
       "build:lib": "rollup -c"
     },
@@ -30,17 +30,19 @@ npm manifest:
       "types/*.d.ts"
     ],
     "dependencies": {
-      "antd": "^3.4.1",
       "lodash.clonedeep": "^4.5.0",
       "lodash.random": "^3.2.0",
+      "lodash.throttle": "^4.1.1",
       "rc-tooltip": "^3.7.0",
       "react": "^16.3.1",
       "react-dnd": "^2.6.0",
       "react-dnd-html5-backend": "^2.6.0",
       "react-dom": "^16.3.1",
-      "unstated": "^2.0.1"
+      "react-pose": "^1.5.2",
+      "unstated": "1.2.0"
     },
     "devDependencies": {
+      "antd": "^3.4.1",
       "babel-plugin-external-helpers": "^6.22.0",
       "babel-plugin-transform-class-properties": "^6.24.1",
       "babel-plugin-transform-decorators-legacy": "^1.3.4",
@@ -2274,6 +2276,10 @@ Lockfile:
     dependencies:
       map-cache "^0.2.2"
   
+  framesync@^3.0.2, framesync@^3.1.7:
+    version "3.1.7"
+    resolved "http://registry.npm.taobao.org/framesync/download/framesync-3.1.7.tgz#9b9aa3eff8598625302597851a428f40c3dc1c6b"
+  
   fresh@0.5.2:
     version "0.5.2"
     resolved "http://registry.npm.taobao.org/fresh/download/fresh-0.5.2.tgz#3d8cadd90d976569fa835ab1f8e4b23a105605a7"
@@ -3230,7 +3236,7 @@ Lockfile:
     version "3.2.0"
     resolved "http://registry.npm.taobao.org/lodash.random/download/lodash.random-3.2.0.tgz#96e24e763333199130d2c9e2fd57f91703cc262d"
   
-  lodash.throttle@^4.0.0:
+  lodash.throttle@^4.0.0, lodash.throttle@^4.1.1:
     version "4.1.1"
     resolved "http://registry.npm.taobao.org/lodash.throttle/download/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
   
@@ -3921,6 +3927,20 @@ Lockfile:
     resolved "http://registry.npm.taobao.org/plur/download/plur-2.1.2.tgz#7482452c1a0f508e3e344eaec312c91c29dc655a"
     dependencies:
       irregular-plurals "^1.0.0"
+  
+  popmotion-pose@^1.3.0:
+    version "1.3.0"
+    resolved "http://registry.npm.taobao.org/popmotion-pose/download/popmotion-pose-1.3.0.tgz#1dd082b4d18770c552b3bc6d89f270e78683909e"
+    dependencies:
+      popmotion "^8.1.22"
+  
+  popmotion@^8.1.22:
+    version "8.1.22"
+    resolved "http://registry.npm.taobao.org/popmotion/download/popmotion-8.1.22.tgz#71857484546ae5b7335b0704423a3a761de1fe67"
+    dependencies:
+      framesync "^3.1.7"
+      style-value-types "^1.0.4"
+      stylefire "^1.2.9"
   
   posix-character-classes@^0.1.0:
     version "0.1.1"
@@ -4764,9 +4784,20 @@ Lockfile:
       lodash.throttle "^4.0.0"
       prop-types "^15.5.8"
   
+  react-lifecycles-compat@^1.1.4:
+    version "1.1.4"
+    resolved "http://registry.npm.taobao.org/react-lifecycles-compat/download/react-lifecycles-compat-1.1.4.tgz#fc005c72849b7ed364de20a0f64ff58ebdc2009a"
+  
   react-lifecycles-compat@^3.0.2:
     version "3.0.2"
     resolved "http://registry.npm.taobao.org/react-lifecycles-compat/download/react-lifecycles-compat-3.0.2.tgz#7279047275bd727a912e25f734c0559527e84eff"
+  
+  react-pose@^1.5.2:
+    version "1.5.2"
+    resolved "http://registry.npm.taobao.org/react-pose/download/react-pose-1.5.2.tgz#0dcba78cf76510b4467be8d65f378627bcd73d50"
+    dependencies:
+      popmotion-pose "^1.3.0"
+      react-lifecycles-compat "^1.1.4"
   
   react-slick@~0.22.3:
     version "0.22.3"
@@ -5569,6 +5600,17 @@ Lockfile:
     version "0.3.0"
     resolved "http://registry.npm.taobao.org/style-inject/download/style-inject-0.3.0.tgz#d21c477affec91811cc82355832a700d22bf8dd3"
   
+  style-value-types@^1.0.4:
+    version "1.0.4"
+    resolved "http://registry.npm.taobao.org/style-value-types/download/style-value-types-1.0.4.tgz#58df3a09281d719d981ee4a317addc434eecc877"
+  
+  stylefire@^1.2.9:
+    version "1.2.14"
+    resolved "http://registry.npm.taobao.org/stylefire/download/stylefire-1.2.14.tgz#33c711e3f79da8e8ab80e4a935b12576a4b92c8e"
+    dependencies:
+      framesync "^3.0.2"
+      style-value-types "^1.0.4"
+  
   supports-color@^2.0.0:
     version "2.0.0"
     resolved "http://registry.npm.taobao.org/supports-color/download/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
@@ -5647,10 +5689,6 @@ Lockfile:
     dependencies:
       readable-stream "^2.1.5"
       xtend "~4.0.1"
-  
-  tickedoff@^1.0.1:
-    version "1.0.1"
-    resolved "http://registry.npm.taobao.org/tickedoff/download/tickedoff-1.0.1.tgz#277c463b5b275dc3c7e7473f8eef804254b9002d"
   
   time-zone@^1.0.0:
     version "1.0.0"
@@ -5819,12 +5857,11 @@ Lockfile:
       has-value "^0.3.1"
       isobject "^3.0.0"
   
-  unstated@^2.0.1:
-    version "2.0.2"
-    resolved "http://registry.npm.taobao.org/unstated/download/unstated-2.0.2.tgz#a2f65f2e3694e3a8a8d7c983d2c8d655cdf6acef"
+  unstated@1.2.0:
+    version "1.2.0"
+    resolved "http://registry.npm.taobao.org/unstated/download/unstated-1.2.0.tgz#5c57cc077473d2cce411ec0930da285cef3df306"
     dependencies:
       create-react-context "^0.1.5"
-      tickedoff "^1.0.1"
   
   upath@^1.0.0:
     version "1.0.4"
@@ -6006,17 +6043,72 @@ Lockfile:
       yargs-parser "^5.0.0"
 
 Trace: 
-  Error: Command failed.
+  Error: /home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/node-sass: Command failed.
   Exit code: 1
   Command: sh
-  Arguments: -c rollup -c
-  Directory: /home/hyc/Desktop/source-repos/Drag-Calendar
+  Arguments: -c node scripts/build.js
+  Directory: /home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/node-sass
   Output:
-  
+  Building: /home/hyc/.nvm/versions/node/v8.10.0/bin/node /home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/node-gyp/bin/node-gyp.js rebuild --verbose --libsass_ext= --libsass_cflags= --libsass_ldflags= --libsass_library=
+  gyp info it worked if it ends with ok
+  gyp verb cli [ '/home/hyc/.nvm/versions/node/v8.10.0/bin/node',
+  gyp verb cli   '/home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/node-gyp/bin/node-gyp.js',
+  gyp verb cli   'rebuild',
+  gyp verb cli   '--verbose',
+  gyp verb cli   '--libsass_ext=',
+  gyp verb cli   '--libsass_cflags=',
+  gyp verb cli   '--libsass_ldflags=',
+  gyp verb cli   '--libsass_library=' ]
+  gyp info using node-gyp@3.6.2
+  gyp info using node@8.10.0 | linux | x64
+  gyp verb command rebuild []
+  gyp verb command clean []
+  gyp verb clean removing "build" directory
+  gyp verb command configure []
+  gyp verb check python checking for Python executable "python2" in the PATH
+  gyp verb `which` succeeded python2 /usr/bin/python2
+  gyp verb check python version `/usr/bin/python2 -c "import platform; print(platform.python_version());"` returned: "2.7.13+\n"
+  gyp verb get node dir no --target version specified, falling back to host node version: 8.10.0
+  gyp verb command install [ '8.10.0' ]
+  gyp verb install input version string "8.10.0"
+  gyp verb install installing version: 8.10.0
+  gyp verb install --ensure was passed, so won't reinstall if already installed
+  gyp verb install version not already installed, continuing with install 8.10.0
+  gyp verb ensuring nodedir is created /home/hyc/.node-gyp/8.10.0
+  gyp verb created nodedir /home/hyc/.node-gyp/8.10.0
+  gyp http GET https://nodejs.org/download/release/v8.10.0/node-v8.10.0-headers.tar.gz
+  gyp WARN download ignoring invalid "proxy" config setting: "socks5://127.0.0.1:1080"
+  gyp WARN install got an error, rolling back install
+  gyp verb command remove [ '8.10.0' ]
+  gyp verb remove using node-gyp dir: /home/hyc/.node-gyp
+  gyp verb remove removing target version: 8.10.0
+  gyp verb remove removing development files for version: 8.10.0
+  gyp ERR! configure error 
+  gyp ERR! stack Error: tunneling socket could not be established, cause=Parse Error
+  gyp ERR! stack     at ClientRequest.onError (/home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/tunnel-agent/index.js:177:17)
+  gyp ERR! stack     at Object.onceWrapper (events.js:315:30)
+  gyp ERR! stack     at emitOne (events.js:116:13)
+  gyp ERR! stack     at ClientRequest.emit (events.js:211:7)
+  gyp ERR! stack     at Socket.socketOnData (_http_client.js:445:9)
+  gyp ERR! stack     at emitOne (events.js:116:13)
+  gyp ERR! stack     at Socket.emit (events.js:211:7)
+  gyp ERR! stack     at addChunk (_stream_readable.js:263:12)
+  gyp ERR! stack     at readableAddChunk (_stream_readable.js:250:11)
+  gyp ERR! stack     at Socket.Readable.push (_stream_readable.js:208:10)
+  gyp ERR! System Linux 4.9.0-deepin13-amd64
+  gyp ERR! command "/home/hyc/.nvm/versions/node/v8.10.0/bin/node" "/home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/node-gyp/bin/node-gyp.js" "rebuild" "--verbose" "--libsass_ext=" "--libsass_cflags=" "--libsass_ldflags=" "--libsass_library="
+  gyp ERR! cwd /home/hyc/Desktop/source-repos/Drag-Calendar/node_modules/node-sass
+  gyp ERR! node -v v8.10.0
+  gyp ERR! node-gyp -v v3.6.2
+  gyp ERR! not ok 
+  Build failed with error code: 1
       at ProcessTermError.MessageError (/usr/share/yarn/lib/cli.js:186:110)
       at new ProcessTermError (/usr/share/yarn/lib/cli.js:226:113)
       at ChildProcess.<anonymous> (/usr/share/yarn/lib/cli.js:30281:17)
       at emitTwo (events.js:126:13)
       at ChildProcess.emit (events.js:214:7)
       at maybeClose (internal/child_process.js:925:16)
-      at Process.ChildProcess._handle.onexit (internal/child_process.js:209:5)
+      at Socket.stream.socket.on (internal/child_process.js:346:11)
+      at emitOne (events.js:116:13)
+      at Socket.emit (events.js:211:7)
+      at Pipe._handle.close [as _onclose] (net.js:567:12)

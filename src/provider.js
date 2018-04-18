@@ -16,7 +16,8 @@ const throttle = require("lodash.throttle");
 
 const _processState = newState => {
   const Day1 = new Date(
-    newState.currentYear + "/" + (newState.currentMonth + 1)
+    // Firefox 需要完整的格式
+    newState.currentYear + "/" + (newState.currentMonth + 1) + "/" + 1
   );
 
   const firstDayOfWeek = Day1.getDay();
@@ -24,7 +25,6 @@ const _processState = newState => {
   newState.dayoffset = dayoffset;
   newState.day1Time = Day1.getTime();
 
-  // log(newState, " = newState");
   return newState;
 };
 
